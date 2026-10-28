@@ -12,7 +12,8 @@ mkdir -p "$OUT"
 export PYTHONPATH="$(cd "$(dirname "$0")/.." && pwd)/src:${PYTHONPATH:-}"
 export MUJOCO_GL=egl PYOPENGL_PLATFORM=egl
 for i in 0 1; do
-  setsid nohup python -u -m evla.run_eval "$@" --shard "$i/2" --device "cuda:$i" \
-    --max-hours "$MAXH" --out "$OUT/${NAME}_s$i.csv" > "$OUT/${NAME}_s$i.stdout" 2>&1 < /dev/null &
-  echo "shard $i pid $!"
+  setsid -f nohup python -u -m evla.run_eval "$@" --shard "$i/2" --device "cuda:$i" \
+    --max-hours "$MAXH" --out "$OUT/${NAME}_s$i.csv" > "$OUT/${NAME}_s$i.stdout" 2>&1 < /dev/null
 done
+sleep 1
+pgrep -af "evla.run_eval" | grep -- "$NAME" | head -4
