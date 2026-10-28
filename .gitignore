@@ -5,7 +5,7 @@ outputs/
 *.pt
 *.safetensors
 *.mp4
-!results/videos/*.mp4
+!results/**/*_videos/*.mp4
 paper/*.aux
 paper/*.log
 paper/*.out

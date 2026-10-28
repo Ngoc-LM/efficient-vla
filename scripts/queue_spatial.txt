@@ -1,0 +1,6 @@
+# LIBERO-Spatial, tasks 0-9 x init states 0-19, same episodes and flow noise (CRN) as the baseline
+spatial_ol5          --method open_loop --k 5
+spatial_cold3        --method flow --flow-steps 3
+spatial_warm         --method warm --warm-t0 0.7 --warm-steps 3
+spatial_stale5_warm  --method stale_warm --k 5 --warm-t0 0.7 --warm-steps 3
+spatial_stale5_cold3 --method stale --k 5 --flow-steps 3
