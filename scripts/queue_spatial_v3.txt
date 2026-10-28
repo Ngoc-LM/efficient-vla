@@ -1,0 +1,8 @@
+# LIBERO-Spatial, same (task, init state) episodes and flow noise (CRN) as spatial_baseline.
+# After H1 failed (open-loop K=5: -12.5 pp), keep closed-loop control and cut the cost of each re-plan.
+! while pgrep -f -- '-m evla[.]profile' > /dev/null; do sleep 30; done
+spatial_cold3          --method flow --flow-steps 3
+spatial_stale5_cold3   --method stale --k 5 --flow-steps 3
+spatial_ol5_evt        --method open_loop --k 5 --event-trigger --hold 5
+spatial_cold3_fp16     --method flow --flow-steps 3 --dtype fp16
+spatial_ol10           --method open_loop --k 10
