@@ -1,0 +1,122 @@
+Loading  HuggingFaceTB/SmolVLM2-500M-Instruct weights ...
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading  HuggingFaceTB/SmolVLM2-500M-Instruct weights ...
+Creating LIBERO envs | suites=['libero_spatial'] | n_envs(per task)=1 | init_states=True
+Restricting to task_ids=[0]
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built vec env | suite=libero_spatial | task_id=0 | n_envs=1
+Local assets not found. Downloading from HuggingFace Hub...
+Downloading LIBERO assets from Hugging Face...
+Assets downloaded successfully to /root/.cache/libero/assets
+round 1/2 done
+round 2/2 done
+native/vision                    p50=  204.33  p90=  207.79  mean=  204.64 ms
+native/prefix                    p50=  277.22  p90=  279.78  mean=  276.38 ms
+native/expert1                   p50=   49.82  p90=   51.39  mean=   49.98 ms
+native/chunk_s10                 p50=  770.95  p90=  785.52  mean=  772.21 ms
+native/chunk_s5                  p50=  526.48  p90=  534.34  mean=  528.13 ms
+native/chunk_s3                  p50=  427.67  p90=  431.20  mean=  427.96 ms
+native/stale_s10                 p50=  554.69  p90=  566.66  mean=  556.42 ms
+native/stale_s5                  p50=  300.94  p90=  313.54  mean=  303.56 ms
+native/stale_s3                  p50=  199.78  p90=  203.89  mean=  200.01 ms
+native/e2e                       p50=  787.88  p90=  802.42  mean=  791.56 ms
+fp32/vision                      p50=  140.29  p90=  143.72  mean=  140.31 ms
+fp32/prefix                      p50=  190.36  p90=  193.37  mean=  190.02 ms
+fp32/expert1                     p50=   45.51  p90=   47.17  mean=   46.57 ms
+fp32/chunk_s10                   p50=  636.50  p90=  647.71  mean=  636.98 ms
+fp32/chunk_s5                    p50=  412.24  p90=  420.75  mean=  413.43 ms
+fp32/chunk_s3                    p50=  323.04  p90=  326.97  mean=  323.91 ms
+fp32/stale_s10                   p50=  498.01  p90=  530.05  mean=  504.48 ms
+fp32/stale_s5                    p50=  269.58  p90=  276.59  mean=  271.25 ms
+fp32/stale_s3                    p50=  181.60  p90=  185.57  mean=  181.46 ms
+fp32/e2e                         p50=  658.85  p90=  695.88  mean=  664.21 ms
+native_amp16/vision              p50=   43.10  p90=   44.10  mean=   42.74 ms
+native_amp16/prefix              p50=   96.58  p90=   98.92  mean=   97.27 ms
+native_amp16/expert1             p50=   58.34  p90=   59.75  mean=   58.56 ms
+native_amp16/chunk_s10           p50=  677.58  p90=  707.01  mean=  682.07 ms
+native_amp16/chunk_s5            p50=  386.79  p90=  393.27  mean=  387.41 ms
+native_amp16/chunk_s3            p50=  272.54  p90=  280.06  mean=  273.69 ms
+native_amp16/stale_s10           p50=  637.26  p90=  657.12  mean=  639.48 ms
+native_amp16/stale_s5            p50=  348.35  p90=  356.48  mean=  350.35 ms
+native_amp16/stale_s3            p50=  235.53  p90=  244.17  mean=  237.28 ms
+native_amp16/e2e                 p50=  685.77  p90=  709.25  mean=  689.30 ms
+fp32_amp16/vision                p50=   40.53  p90=   41.73  mean=   40.55 ms
+fp32_amp16/prefix                p50=   95.09  p90=   98.88  mean=   95.95 ms
+fp32_amp16/expert1               p50=   56.66  p90=   58.26  mean=   56.83 ms
+fp32_amp16/chunk_s10             p50=  668.33  p90=  679.54  mean=  668.71 ms
+fp32_amp16/chunk_s5              p50=  383.03  p90=  397.31  mean=  384.50 ms
+fp32_amp16/chunk_s3              p50=  269.13  p90=  275.08  mean=  271.28 ms
+fp32_amp16/stale_s10             p50=  639.63  p90=  655.08  mean=  640.93 ms
+fp32_amp16/stale_s5              p50=  345.64  p90=  368.43  mean=  348.98 ms
+fp32_amp16/stale_s3              p50=  231.22  p90=  234.09  mean=  230.80 ms
+fp32_amp16/e2e                   p50=  681.96  p90=  713.41  mean=  686.76 ms
+sim/env_step                     p50=   31.66  p90=   33.41  mean=   31.81 ms
+{
+ "flops_gflop": {
+  "vision": 430.637580288,
+  "prefix": 527.108395008,
+  "expert1": 11.4566144,
+  "chunk": 641.674539008,
+  "stale": 115.21366016
+ },
+ "peak_mem": {
+  "native": {
+   "weights_mib": 1161.5105590820312,
+   "activation_peak_mib": 130.62939453125,
+   "total_mib": 1292.1399536132812
+  },
+  "fp32": {
+   "weights_mib": 2307.6407470703125,
+   "activation_peak_mib": 36.234375,
+   "total_mib": 2343.8751220703125
+  },
+  "native_amp16": {
+   "weights_mib": 1161.5105590820312,
+   "activation_peak_mib": 30.234375,
+   "total_mib": 1191.7449340820312
+  },
+  "fp32_amp16": {
+   "weights_mib": 2307.6407470703125,
+   "activation_peak_mib": 30.234375,
+   "total_mib": 2337.8751220703125
+  }
+ },
+ "info": {
+  "gpu": "Tesla T4",
+  "torch": "2.11.0+cu128",
+  "equivalence_native": {
+   "max_abs_diff_refresh_every_step": 0.029331445693969727,
+   "max_abs_diff_cached_same_image": 0.029331445693969727,
+   "action_abs_mean": 0.18022537231445312
+  },
+  "param_dtypes_native": {
+   "bfloat16": 600902304,
+   "float32": 4031872
+  },
+  "equivalence_fp32": {
+   "max_abs_diff_refresh_every_step": 7.271766662597656e-06,
+   "max_abs_diff_cached_same_image": 7.271766662597656e-06,
+   "action_abs_mean": 0.15655921399593353
+  },
+  "param_dtypes_fp32": {
+   "float32": 604934176
+  },
+  "equivalence_native_amp16": {
+   "max_abs_diff_refresh_every_step": 0.0159912109375,
+   "max_abs_diff_cached_same_image": 0.0159912109375,
+   "action_abs_mean": 0.19092372059822083
+  },
+  "equivalence_fp32_amp16": {
+   "max_abs_diff_refresh_every_step": 0.0032958984375,
+   "max_abs_diff_cached_same_image": 0.0032958984375,
+   "action_abs_mean": 0.16978232562541962
+  },
+  "params": {
+   "vision_encoder": 86433024,
+   "connector": 11796480,
+   "text_model": 361944000,
+   "action_expert": 96696800,
+   "total": 604934176
+  }
+ }
+}

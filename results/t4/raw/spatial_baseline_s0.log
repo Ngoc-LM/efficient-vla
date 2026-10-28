@@ -1,0 +1,56 @@
+[10:42:35] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '0-19', 'method': 'baseline', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': None, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'native', 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:0', 'seed_base': 1000, 'shard': '0/2', 'out': '/kaggle/working/results/raw/spatial_baseline_s0.csv', 'max_hours': 10.0, 'save_actions': True, 'videos': 3} | shard episodes=100 done=0
+[10:42:59] policy cfg: n_action_steps=1 chunk=50 num_steps=10 dtypes={'bfloat16': 600902304, 'float32': 4031872} gpu=Tesla T4
+[10:47:16] t0 i0 success=0 steps=280 calls=280 vision=280 policy=233.4s wall=255.3s | 1/100 SR=0.000 ETA=7.07h
+[10:52:14] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '0-19', 'method': 'baseline', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': None, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'native', 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:0', 'seed_base': 1000, 'shard': '0/4', 'skip_from': '/kaggle/working/results/raw/spatial_baseline_s*.csv', 'out': '/kaggle/working/results/raw/spatial_baseline_s0.csv', 'max_hours': 10.0, 'save_actions': True, 'videos': 2} | shard episodes=50 done=1
+[10:53:00] policy cfg: n_action_steps=1 chunk=50 num_steps=10 dtypes={'bfloat16': 600902304, 'float32': 4031872} gpu=Tesla T4
+[10:59:45] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '0-19', 'method': 'baseline', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': None, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'native', 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:0', 'seed_base': 1000, 'shard': '0/4', 'skip_from': '/kaggle/working/results/raw/spatial_baseline_s*.csv', 'out': '/kaggle/working/results/raw/spatial_baseline_s0.csv', 'max_hours': 10.0, 'save_actions': True, 'videos': 2} | shard episodes=50 done=1
+[11:00:36] policy cfg: n_action_steps=1 chunk=50 num_steps=10 dtypes={'bfloat16': 600902304, 'float32': 4031872} gpu=Tesla T4
+[11:10:01] t0 i4 success=0 steps=280 calls=280 vision=280 policy=513.4s wall=562.2s | 1/49 SR=0.000 ETA=7.53h
+[11:12:27] t0 i8 success=1 steps=71 calls=71 vision=71 policy=134.1s wall=145.9s | 2/49 SR=0.500 ETA=4.64h
+[11:15:03] t0 i12 success=1 steps=75 calls=75 vision=75 policy=141.9s wall=155.3s | 3/49 SR=0.667 ETA=3.69h
+[11:17:18] t0 i16 success=1 steps=65 calls=65 vision=65 policy=122.7s wall=134.8s | 4/49 SR=0.750 ETA=3.13h
+[11:21:00] t1 i0 success=1 steps=105 calls=105 vision=105 policy=199.2s wall=220.7s | 5/49 SR=0.800 ETA=2.99h
+[11:24:27] t1 i4 success=1 steps=101 calls=101 vision=101 policy=191.5s wall=207.1s | 6/49 SR=0.833 ETA=2.85h
+[11:28:04] t1 i8 success=1 steps=104 calls=104 vision=104 policy=200.8s wall=216.9s | 7/49 SR=0.857 ETA=2.75h
+[11:31:14] t1 i12 success=1 steps=96 calls=96 vision=96 policy=175.9s wall=190.4s | 8/49 SR=0.875 ETA=2.62h
+[11:34:35] t1 i16 success=1 steps=99 calls=99 vision=99 policy=186.4s wall=201.3s | 9/49 SR=0.889 ETA=2.52h
+[11:43:22] t2 i0 success=0 steps=280 calls=280 vision=280 policy=486.8s wall=525.1s | 10/49 SR=0.800 ETA=2.78h
+[11:46:15] t2 i4 success=1 steps=101 calls=101 vision=101 policy=160.4s wall=172.7s | 11/49 SR=0.818 ETA=2.63h
+[11:54:31] t2 i8 success=0 steps=280 calls=280 vision=280 policy=465.9s wall=496.3s | 12/49 SR=0.750 ETA=2.77h
+[11:57:46] t2 i12 success=1 steps=109 calls=109 vision=109 policy=180.7s wall=194.7s | 13/49 SR=0.769 ETA=2.64h
+[12:00:29] t2 i16 success=1 steps=93 calls=93 vision=93 policy=151.7s wall=163.5s | 14/49 SR=0.786 ETA=2.50h
+[12:02:49] t3 i0 success=1 steps=83 calls=83 vision=83 policy=124.4s wall=138.9s | 15/49 SR=0.800 ETA=2.35h
+[12:09:47] t3 i4 success=0 steps=280 calls=280 vision=280 policy=393.0s wall=418.3s | 16/49 SR=0.750 ETA=2.38h
+[12:12:09] t3 i8 success=1 steps=94 calls=94 vision=94 policy=131.4s wall=141.3s | 17/49 SR=0.765 ETA=2.24h
+[12:14:34] t3 i12 success=1 steps=95 calls=95 vision=95 policy=135.2s wall=145.2s | 18/49 SR=0.778 ETA=2.12h
+[12:21:35] t3 i16 success=0 steps=280 calls=280 vision=280 policy=396.8s wall=420.6s | 19/49 SR=0.737 ETA=2.13h
+[12:25:36] t4 i0 success=1 steps=157 calls=157 vision=157 policy=222.1s wall=240.5s | 20/49 SR=0.750 ETA=2.05h
+[12:28:57] t4 i4 success=1 steps=131 calls=131 vision=131 policy=188.2s wall=201.1s | 21/49 SR=0.762 ETA=1.96h
+[12:32:11] t4 i8 success=1 steps=132 calls=132 vision=132 policy=181.4s wall=194.4s | 22/49 SR=0.773 ETA=1.87h
+[12:39:13] t4 i12 success=0 steps=280 calls=280 vision=280 policy=396.7s wall=421.9s | 23/49 SR=0.739 ETA=1.86h
+[12:42:31] t4 i16 success=1 steps=132 calls=132 vision=132 policy=184.8s wall=197.6s | 24/49 SR=0.750 ETA=1.77h
+[12:44:50] t5 i0 success=1 steps=91 calls=91 vision=91 policy=125.9s wall=138.9s | 25/49 SR=0.760 ETA=1.67h
+[12:47:17] t5 i4 success=1 steps=98 calls=98 vision=98 policy=136.5s wall=147.2s | 26/49 SR=0.769 ETA=1.57h
+[12:49:42] t5 i8 success=1 steps=97 calls=97 vision=97 policy=133.9s wall=144.2s | 27/49 SR=0.778 ETA=1.48h
+[12:51:43] t5 i12 success=1 steps=81 calls=81 vision=81 policy=112.9s wall=121.8s | 28/49 SR=0.786 ETA=1.39h
+[12:54:04] t5 i16 success=1 steps=94 calls=94 vision=94 policy=130.8s wall=141.0s | 29/49 SR=0.793 ETA=1.30h
+[12:57:09] t6 i0 success=1 steps=120 calls=120 vision=120 policy=169.3s wall=184.1s | 30/49 SR=0.800 ETA=1.23h
+[12:59:58] t6 i4 success=1 steps=112 calls=112 vision=112 policy=158.0s wall=168.9s | 31/49 SR=0.806 ETA=1.16h
+[13:02:49] t6 i8 success=1 steps=116 calls=116 vision=116 policy=159.7s wall=170.8s | 32/49 SR=0.812 ETA=1.08h
+[13:05:19] t6 i12 success=1 steps=101 calls=101 vision=101 policy=140.0s wall=149.8s | 33/49 SR=0.818 ETA=1.01h
+[13:12:15] t6 i16 success=0 steps=280 calls=280 vision=280 policy=392.4s wall=416.5s | 34/49 SR=0.794 ETA=0.97h
+[13:16:03] t7 i0 success=1 steps=148 calls=148 vision=148 policy=208.8s wall=226.9s | 35/49 SR=0.800 ETA=0.90h
+[13:18:44] t7 i4 success=1 steps=108 calls=108 vision=108 policy=149.8s wall=160.9s | 36/49 SR=0.806 ETA=0.83h
+[13:25:32] t7 i8 success=0 steps=280 calls=280 vision=280 policy=385.2s wall=408.7s | 37/49 SR=0.784 ETA=0.78h
+[13:28:11] t7 i12 success=1 steps=106 calls=106 vision=106 policy=147.9s wall=158.6s | 38/49 SR=0.789 ETA=0.71h
+[13:32:35] t7 i16 success=1 steps=175 calls=175 vision=175 policy=247.0s wall=264.5s | 39/49 SR=0.795 ETA=0.65h
+[13:35:04] t8 i0 success=1 steps=97 calls=97 vision=97 policy=134.6s wall=148.0s | 40/49 SR=0.800 ETA=0.58h
+[13:42:03] t8 i4 success=0 steps=280 calls=280 vision=280 policy=396.6s wall=419.2s | 41/49 SR=0.780 ETA=0.53h
+[13:44:26] t8 i8 success=1 steps=95 calls=95 vision=95 policy=132.6s wall=142.4s | 42/49 SR=0.786 ETA=0.46h
+[13:46:38] t8 i12 success=1 steps=86 calls=86 vision=86 policy=123.6s wall=132.7s | 43/49 SR=0.791 ETA=0.39h
+[13:49:04] t8 i16 success=1 steps=96 calls=96 vision=96 policy=135.5s wall=145.4s | 44/49 SR=0.795 ETA=0.32h
+[13:52:15] t9 i0 success=1 steps=126 calls=126 vision=126 policy=174.0s wall=190.4s | 45/49 SR=0.800 ETA=0.25h
+[13:55:18] t9 i4 success=1 steps=123 calls=123 vision=123 policy=170.8s wall=182.8s | 46/49 SR=0.804 ETA=0.19h
+[14:02:14] t9 i8 success=0 steps=280 calls=280 vision=280 policy=393.2s wall=416.9s | 47/49 SR=0.787 ETA=0.13h
+[14:05:27] t9 i12 success=1 steps=129 calls=129 vision=129 policy=180.0s wall=192.8s | 48/49 SR=0.792 ETA=0.06h
+[14:08:36] t9 i16 success=1 steps=126 calls=126 vision=126 policy=175.6s wall=188.4s | 49/49 SR=0.796 ETA=0.00h

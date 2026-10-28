@@ -1,0 +1,93 @@
+{
+ "args": {
+  "suite": "libero_object",
+  "tasks": "0-4",
+  "inits": "0",
+  "t0s": "0.3,0.5,0.7",
+  "ms": "2,3",
+  "max_steps": 120,
+  "device": "cuda:1",
+  "out": "/kaggle/working/results/calib/calib_object.json"
+ },
+ "episodes": [
+  [
+   0,
+   0
+  ],
+  [
+   1,
+   0
+  ],
+  [
+   2,
+   0
+  ],
+  [
+   3,
+   0
+  ],
+  [
+   4,
+   0
+  ]
+ ],
+ "success": [
+  false,
+  false,
+  true,
+  false,
+  false
+ ],
+ "summary": {
+  "cold10_other_noise": {
+   "n": 586,
+   "err_first": 1.3726342011738963,
+   "err_first5": 1.16411168110452
+  },
+  "cold2": {
+   "n": 586,
+   "err_first": 0.5092109769531892,
+   "err_first5": 0.3829956192764813
+  },
+  "cold3": {
+   "n": 586,
+   "err_first": 0.31847434979148287,
+   "err_first5": 0.2303494667767868
+  },
+  "prior_only": {
+   "n": 581,
+   "err_first": 1.3101601320320482,
+   "err_first5": 1.1580119978078671
+  },
+  "warm_t0.3_m2": {
+   "n": 581,
+   "err_first": 0.8220791831971651,
+   "err_first5": 0.8110240877905729
+  },
+  "warm_t0.3_m3": {
+   "n": 581,
+   "err_first": 0.826226717582463,
+   "err_first5": 0.8149588503289756
+  },
+  "warm_t0.5_m2": {
+   "n": 581,
+   "err_first": 0.5490691551550736,
+   "err_first5": 0.5552196841231722
+  },
+  "warm_t0.5_m3": {
+   "n": 581,
+   "err_first": 0.5287302188934332,
+   "err_first5": 0.5516538817544505
+  },
+  "warm_t0.7_m2": {
+   "n": 581,
+   "err_first": 0.43727903561778814,
+   "err_first5": 0.3732335941926953
+  },
+  "warm_t0.7_m3": {
+   "n": 581,
+   "err_first": 0.3391936461211995,
+   "err_first5": 0.32386731785335765
+  }
+ }
+}
