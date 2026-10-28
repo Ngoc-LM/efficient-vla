@@ -1,0 +1,13 @@
+# GPU runs (Kaggle): installed by scripts/kaggle_setup.sh
+#   lerobot[smolvla,libero] @ git+https://github.com/huggingface/lerobot.git@v0.6.1
+#   mujoco>=3.3,<3.4
+#   egl_probe, hf-egl-probe (built with cmake<4, --no-build-isolation)
+# CPU tests and analysis:
+torch>=2.7
+numpy>=2.0
+scipy>=1.14
+pandas>=2.2
+matplotlib>=3.8
+openpyxl>=3.1
+pytest>=8
+imageio>=2.34

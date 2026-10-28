@@ -1,0 +1,192 @@
+"""CPU-only tests: episode bookkeeping, common random numbers, refresh rule, paired statistics,
+and the cache-append logic of the stale-vision sampler on a toy attention stack."""
+
+import csv
+import math
+import os
+import sys
+
+import pytest
+import torch
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+
+from evla import common, methods, stats  # noqa: E402
+
+
+def test_parse_range_and_shards():
+    assert common.parse_range("0-3,7,9-10,2") == [0, 1, 2, 3, 7, 9, 10]
+    items = [(t, i) for t in range(10) for i in range(50)]
+    s0, s1 = common.select_shard(items, "0/2"), common.select_shard(items, "1/2")
+    assert len(s0) + len(s1) == 500 and not set(s0) & set(s1)
+    assert {t for t, _ in s0} == set(range(10))  # interleaved shards cover every task
+    with pytest.raises(ValueError):
+        common.parse_range("5-3")
+
+
+def test_resume_reads_done_pairs(tmp_path):
+    p = tmp_path / "r.csv"
+    with open(p, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["task_id", "init_id", "success"])
+        w.writeheader()
+        w.writerow({"task_id": 1, "init_id": 4, "success": 1})
+        w.writerow({"task_id": 2, "init_id": 0, "success": 0})
+    assert common.load_done(p) == {(1, 4), (2, 0)}
+    assert common.load_done(tmp_path / "missing.csv") == set()
+
+
+def test_crn_noise_depends_only_on_episode_and_step():
+    a, b = methods.CRNNoise(), methods.CRNNoise()
+    a.set_episode(common.episode_key(3, 7))
+    b.set_episode(common.episode_key(3, 7))
+    a.step = b.step = 12
+    assert torch.equal(a((1, 50, 32), "cpu"), b((1, 50, 32), "cpu"))
+    b.step = 13
+    assert not torch.equal(a((1, 50, 32), "cpu"), b((1, 50, 32), "cpu"))
+    assert len({methods.crn_seed(k, s) for k in range(20) for s in range(600)}) == 20 * 600
+
+
+def test_refresh_rule():
+    f = methods.should_refresh
+    assert f(False, 0, 5, False, None, None)  # no cache yet
+    assert f(True, 5, 5, False, None, None)  # period reached
+    assert not f(True, 4, 5, False, None, None)
+    assert f(True, 1, 5, True, None, None)  # gripper flip forces refresh
+    assert f(True, 1, 5, False, 0.2, 0.1)  # image changed beyond tau
+    assert not f(True, 1, 5, False, 0.05, 0.1)
+
+
+def test_gripper_flip_forces_refresh():
+    s = methods.StaleVisionSampler.__new__(methods.StaleVisionSampler)
+    s.refresh_on_gripper = True
+    s.reset()
+    s.note_action(torch.tensor([[0.0] * 6 + [-1.0]]))
+    assert not s.forced
+    s.note_action(torch.tensor([[0.0] * 6 + [-0.8]]))
+    assert not s.forced
+    s.note_action(torch.tensor([[0.0] * 6 + [1.0]]))
+    assert s.forced
+
+
+def test_mcnemar_and_newcombe():
+    assert stats.mcnemar_exact(0, 0) == 1.0
+    assert math.isclose(stats.mcnemar_exact(0, 6), 2 * 0.5**6)
+    d, lo, hi = stats.newcombe_paired(40, 5, 5, 50)
+    assert d == 0 and lo < 0 < hi and math.isclose(-lo, hi, rel_tol=1e-9)
+    d, lo, hi = stats.newcombe_paired(30, 15, 2, 53)
+    assert lo < d < hi and lo > 0  # clear improvement of method A
+    for a, b, c, dd in [(0, 0, 0, 10), (10, 0, 0, 0), (3, 7, 0, 0)]:
+        _, lo, hi = stats.newcombe_paired(a, b, c, dd)
+        assert -1 <= lo <= hi <= 1
+
+
+def test_compare_direction_and_noninferiority():
+    rows_a = [{"task_id": t, "init_id": i, "success": 1} for t in range(4) for i in range(25)]
+    rows_b = [dict(r) for r in rows_a]
+    rows_b[0]["success"] = 0
+    res = stats.compare(rows_a, rows_b, margin=0.05)
+    assert res["n_pairs"] == 100 and res["a_only"] == 1 and res["b_only"] == 0
+    assert res["diff_b_minus_a"] == pytest.approx(-0.01)
+    assert res["ci95_newcombe"][0] < -0.01 < res["ci95_newcombe"][1]
+
+
+class _Layer(torch.nn.Module):
+    """Minimal pre-norm attention block exposing the attributes used by append_prefix_tokens."""
+
+    def __init__(self, d):
+        super().__init__()
+
+        class _Attn(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.head_dim = d
+                self.q_proj = torch.nn.Linear(d, d, bias=False)
+                self.k_proj = torch.nn.Linear(d, d, bias=False)
+                self.v_proj = torch.nn.Linear(d, d, bias=False)
+                self.o_proj = torch.nn.Linear(d, d, bias=False)
+
+        self.self_attn = _Attn()
+        self.input_layernorm = torch.nn.LayerNorm(d)
+        self.post_attention_layernorm = torch.nn.LayerNorm(d)
+        self.mlp = torch.nn.Sequential(torch.nn.Linear(d, 2 * d), torch.nn.GELU(), torch.nn.Linear(2 * d, d))
+
+
+class _Cache:
+    def __init__(self):
+        self.k, self.v = {}, {}
+
+    def update(self, k, v, li):
+        if li in self.k:
+            self.k[li] = torch.cat([self.k[li], k], dim=2)
+            self.v[li] = torch.cat([self.v[li], v], dim=2)
+        else:
+            self.k[li], self.v[li] = k, v
+        return self.k[li], self.v[li]
+
+
+class _ToyVWE:
+    """Toy stand-in for SmolVLMWithExpertModel: self-attention prefill with a K/V cache."""
+
+    def __init__(self, d=8, n_layers=3):
+        torch.manual_seed(0)
+        self.layers = [_Layer(d) for _ in range(n_layers)]
+        self.num_vlm_layers = n_layers
+        self.lm_expert = None
+        self.d = d
+
+        class _Cfg:
+            class text_config:  # noqa: N801
+                head_dim = d
+
+        class _Vlm:
+            config = _Cfg
+
+        self.vlm = _Vlm
+
+    def get_vlm_model(self):
+        class _M:
+            text_model = None
+
+        return _M
+
+    def get_model_layers(self, models):
+        return [self.layers, [None] * self.num_vlm_layers]
+
+    def forward_attn_layer(self, model_layers, inputs, li, pos, mask, bsz, head_dim, use_cache, past_key_values):
+        layer = model_layers[0][li]
+        h = layer.input_layernorm(inputs[0])
+        q = layer.self_attn.q_proj(h)[:, :, None]  # B,L,H=1,D
+        k = layer.self_attn.k_proj(h)[:, :, None]
+        v = layer.self_attn.v_proj(h)[:, :, None]
+        k, v = past_key_values.update(k.transpose(1, 2), v.transpose(1, 2), li)
+        k, v = k.transpose(1, 2), v.transpose(1, 2)
+        att = torch.einsum("bqhd,bkhd->bhqk", q, k) / math.sqrt(head_dim)
+        att = att.masked_fill(~mask[:, None], float("-inf")).softmax(-1)
+        out = torch.einsum("bhqk,bkhd->bqhd", att, v).reshape(q.shape[0], q.shape[1], -1)
+        return [out], past_key_values
+
+    def full_prefill(self, embs, mask):
+        cache = _Cache()
+        h = embs
+        for li, layer in enumerate(self.layers):
+            (att,), cache = self.forward_attn_layer([self.layers], [h, None], li, None, mask, 1, self.d, True, cache)
+            out = layer.self_attn.o_proj(att) + h
+            h = layer.mlp(layer.post_attention_layernorm(out)) + out
+        return cache
+
+
+def test_append_prefix_tokens_matches_full_prefill():
+    """Image/language tokens never attend to the state token, so prefilling them first and
+    appending the state token later must give the same K/V cache as one joint prefill."""
+    vwe = _ToyVWE()
+    L = 6
+    embs = torch.randn(1, L + 1, vwe.d)
+    full_mask = torch.ones(1, L + 1, L + 1, dtype=torch.bool)
+    full_mask[:, :L, L] = False  # prefix tokens cannot see the state token
+    with torch.no_grad():
+        ref = vwe.full_prefill(embs, full_mask)
+        cache = vwe.full_prefill(embs[:, :L], full_mask[:, :L, :L])
+        cache = methods.append_prefix_tokens(vwe, embs[:, L:], full_mask[:, L:, :], None, cache)
+    for li in range(vwe.num_vlm_layers):
+        assert torch.allclose(ref.k[li], cache.k[li], atol=1e-5)
+        assert torch.allclose(ref.v[li], cache.v[li], atol=1e-5)
