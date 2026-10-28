@@ -1,0 +1,123 @@
+Loading  HuggingFaceTB/SmolVLM2-500M-Instruct weights ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/489 [00:00<?, ?it/s]Loading weights:  21%|██        | 101/489 [00:00<00:00, 987.27it/s]Loading weights:  42%|████▏     | 205/489 [00:00<00:00, 1012.27it/s]Loading weights:  68%|██████▊   | 333/489 [00:00<00:00, 1126.49it/s]Loading weights: 100%|██████████| 489/489 [00:00<00:00, 1244.92it/s]
+Loading  HuggingFaceTB/SmolVLM2-500M-Instruct weights ...
+Loading weights:   0%|          | 0/489 [00:00<?, ?it/s]Loading weights:  38%|███▊      | 185/489 [00:00<00:00, 1846.23it/s]Loading weights:  76%|███████▌  | 370/489 [00:00<00:00, 1739.00it/s]Loading weights: 100%|██████████| 489/489 [00:00<00:00, 1898.23it/s]
+Loading  HuggingFaceTB/SmolVLM2-500M-Instruct weights ...
+Loading weights:   0%|          | 0/489 [00:00<?, ?it/s]Loading weights:  39%|███▉      | 190/489 [00:00<00:00, 1879.70it/s]Loading weights:  80%|████████  | 393/489 [00:00<00:00, 1966.19it/s]Loading weights: 100%|██████████| 489/489 [00:00<00:00, 2016.97it/s]
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /usr/local/lib/python3.13/dist-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /usr/local/lib/python3.13/dist-packages/robosuite/scripts/setup_macros.py
+Creating LIBERO envs | suites=['libero_spatial'] | n_envs(per task)=1 | init_states=True
+Restricting to task_ids=[0]
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built vec env | suite=libero_spatial | task_id=0 | n_envs=1
+Local assets not found. Downloading from HuggingFace Hub...
+Assets already downloaded at /root/.cache/libero/assets
+round 1/3 done
+round 2/3 done
+round 3/3 done
+native/vision                    p50=  229.81  p90=  239.53  mean=  230.02 ms
+native/prefix                    p50=  303.78  p90=  313.71  mean=  305.39 ms
+native/expert1                   p50=   50.89  p90=   53.13  mean=   51.48 ms
+native/chunk_s10                 p50=  814.33  p90=  821.66  mean=  813.99 ms
+native/chunk_s3                  p50=  457.83  p90=  466.00  mean=  458.51 ms
+native/stale_s10                 p50=  560.36  p90=  573.29  mean=  562.49 ms
+native/stale_s3                  p50=  204.66  p90=  208.72  mean=  205.55 ms
+native/e2e                       p50=  825.83  p90=  841.69  mean=  828.40 ms
+fp16/vision                      p50=   38.55  p90=   40.91  mean=   38.32 ms
+fp16/prefix                      p50=   82.16  p90=   84.78  mean=   83.38 ms
+fp16/expert1                     p50=   51.90  p90=   53.65  mean=   52.11 ms
+fp16/chunk_s10                   p50=  604.71  p90=  613.68  mean=  605.42 ms
+fp16/chunk_s3                    p50=  243.42  p90=  248.49  mean=  244.52 ms
+fp16/stale_s10                   p50=  572.43  p90=  584.13  mean=  571.63 ms
+fp16/stale_s3                    p50=  207.46  p90=  213.52  mean=  208.80 ms
+fp16/e2e                         p50=  616.96  p90=  656.93  mean=  623.64 ms
+visfp16/vision                   p50=   35.75  p90=   36.58  mean=   35.70 ms
+visfp16/prefix                   p50=  110.77  p90=  113.59  mean=  111.12 ms
+visfp16/expert1                  p50=   51.08  p90=   52.56  mean=   51.66 ms
+visfp16/chunk_s10                p50=  615.84  p90=  627.73  mean=  617.52 ms
+visfp16/chunk_s3                 p50=  262.25  p90=  269.52  mean=  263.48 ms
+visfp16/stale_s10                p50=  557.94  p90=  568.49  mean=  559.29 ms
+visfp16/stale_s3                 p50=  204.25  p90=  207.83  mean=  204.89 ms
+visfp16/e2e                      p50=  626.48  p90=  642.44  mean=  629.52 ms
+sim/env_step                     p50=   32.51  p90=   36.08  mean=   33.36 ms
+{
+ "flops_gflop": {
+  "vision": 430.637580288,
+  "prefix": 527.108395008,
+  "expert1": 11.4566144,
+  "chunk": 641.674539008,
+  "stale": 115.21366016
+ },
+ "peak_mem": {
+  "native": {
+   "weights_mib": 1161.5105590820312,
+   "activation_peak_mib": 132.62158203125,
+   "total_mib": 1294.1321411132812
+  },
+  "fp16": {
+   "weights_mib": 1155.2605590820312,
+   "activation_peak_mib": 20.9921875,
+   "total_mib": 1176.2527465820312
+  },
+  "visfp16": {
+   "weights_mib": 1161.5105590820312,
+   "activation_peak_mib": 20.9921875,
+   "total_mib": 1182.5027465820312
+  }
+ },
+ "info": {
+  "gpu": "Tesla T4",
+  "torch": "2.11.0+cu128",
+  "param_dtypes_native": {
+   "bfloat16": 600902304,
+   "float32": 4031872
+  },
+  "param_dtypes_fp16": {
+   "float16": 604179104,
+   "float32": 755072
+  },
+  "param_dtypes_visfp16": {
+   "float16": 98229504,
+   "bfloat16": 502672800,
+   "float32": 4031872
+  },
+  "equivalence_native": {
+   "max_abs_diff_refresh_every_step": 0.029060721397399902,
+   "max_abs_diff_cached_same_image": 0.029060721397399902,
+   "action_abs_mean": 0.16780641674995422,
+   "chunk_max_abs_diff_vs_native": 0.0,
+   "chunk_mean_abs_diff_vs_native": 0.0,
+   "finite": true
+  },
+  "equivalence_fp16": {
+   "max_abs_diff_refresh_every_step": 0.0032032132148742676,
+   "max_abs_diff_cached_same_image": 0.0032032132148742676,
+   "action_abs_mean": 0.16796965897083282,
+   "chunk_max_abs_diff_vs_native": 0.049413055181503296,
+   "chunk_mean_abs_diff_vs_native": 0.010033675469458103,
+   "finite": true
+  },
+  "equivalence_visfp16": {
+   "max_abs_diff_refresh_every_step": 0.09504902362823486,
+   "max_abs_diff_cached_same_image": 0.09504902362823486,
+   "action_abs_mean": 0.1676710993051529,
+   "chunk_max_abs_diff_vs_native": 0.048511624336242676,
+   "chunk_mean_abs_diff_vs_native": 0.008329639211297035,
+   "finite": true
+  },
+  "params": {
+   "vision_encoder": 86433024,
+   "connector": 11796480,
+   "text_model": 361944000,
+   "action_expert": 96696800,
+   "total": 604934176
+  }
+ }
+}

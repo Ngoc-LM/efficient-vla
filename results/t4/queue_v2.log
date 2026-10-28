@@ -4,3 +4,5 @@
 3474 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 5 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_ol5_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol5_s2.csv
 3477 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 5 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_ol5_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol5_s3.csv
 [15:31:03] done  spatial_ol5: 200 episodes
+pushed 469 files -> results/t4 @ 10985b0
+[15:31:06] run: python -u -m evla.profile --modes native,fp16,visfp16 --flow-steps 10,3 --repeats 60 --rounds 3 --warmup 10 --out /kaggle/working/results/profile/profile_t4_v2.json > /kaggle/working/results/profile/profile_v2.log 2>&1

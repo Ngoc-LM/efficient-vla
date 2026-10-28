@@ -1,0 +1,2 @@
+[15:35:06] run: while pgrep -f -- '-m evla[.]profile' > /dev/null; do sleep 30; done
+[15:42:06] done: exit 0
