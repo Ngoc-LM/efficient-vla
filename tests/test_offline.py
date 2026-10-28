@@ -190,3 +190,32 @@ def test_append_prefix_tokens_matches_full_prefill():
     for li in range(vwe.num_vlm_layers):
         assert torch.allclose(ref.k[li], cache.k[li], atol=1e-5)
         assert torch.allclose(ref.v[li], cache.v[li], atol=1e-5)
+
+
+def test_shift_chunk():
+    c = torch.arange(10, dtype=torch.float32).view(1, 5, 2)
+    s = methods.shift_chunk(c, 1)
+    assert s.shape == c.shape
+    assert torch.equal(s[:, :4], c[:, 1:]) and torch.equal(s[:, 4], c[:, 4])
+    assert torch.equal(methods.shift_chunk(c, 0), c)
+
+
+def test_warm_integrate_matches_euler_from_t1_and_is_exact_on_linear_path():
+    torch.manual_seed(0)
+    noise = torch.randn(1, 50, 32)
+
+    def f(x, t):  # arbitrary smooth field
+        return 0.1 * x + t[:, None, None]
+
+    ref, dt = noise.clone(), -1.0 / 4
+    for i in range(4):
+        ref = ref + dt * f(ref, torch.full((1,), 1.0 + i * dt))
+    out = methods.warm_integrate(f, noise, prior=torch.zeros_like(noise), t0=1.0, steps=4)
+    assert torch.allclose(out, ref, atol=1e-6)
+
+    # With the exact conditional velocity of the training path, x_t = t*eps + (1-t)*a,
+    # u = (x_t - a)/t, a warm start from the true chunk lands exactly on it for any t0 and M.
+    a = torch.randn(1, 50, 32)
+    for t0, m in [(0.3, 1), (0.5, 3), (0.8, 5)]:
+        out = methods.warm_integrate(lambda x, t: (x - a) / t[:, None, None], noise, a, t0, m)
+        assert torch.allclose(out, a, atol=1e-5)

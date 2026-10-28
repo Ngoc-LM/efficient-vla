@@ -37,6 +37,8 @@ FIELDS = [
     "refresh_period",
     "refresh_image",
     "refresh_gripper",
+    "n_warm",
+    "n_cold",
     "gpu",
     "finished_at",
 ]
@@ -54,8 +56,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--suite", default="libero_spatial")
     ap.add_argument("--tasks", default="0-9")
     ap.add_argument("--inits", default="0-49")
-    ap.add_argument("--method", choices=["baseline", "open_loop", "flow", "stale"], default="baseline")
+    ap.add_argument(
+        "--method", choices=["baseline", "open_loop", "flow", "stale", "warm", "stale_warm"], default="baseline"
+    )
     ap.add_argument("--k", type=int, default=5, help="open_loop: n_action_steps; stale: refresh period")
+    ap.add_argument("--warm-t0", type=float, default=0.5, help="warm: flow time of the noised prior")
+    ap.add_argument("--warm-steps", type=int, default=3, help="warm: Euler steps from t0 to 0")
     ap.add_argument("--flow-steps", type=int, default=None, help="Euler steps (default: checkpoint, 10)")
     ap.add_argument("--img-tau", type=float, default=None, help="stale: image-change refresh threshold")
     ap.add_argument("--no-gripper-refresh", action="store_true")
@@ -107,13 +113,15 @@ def main(argv: list[str] | None = None) -> int:
     stats = methods.CallStats()
     crn = methods.CRNNoise()
     sampler = None
-    if args.method == "stale":
-        sampler = methods.install_stale(
+    if args.method in ("stale", "warm", "stale_warm"):
+        sampler = methods.install_sampler(
             policy,
             stats,
-            refresh_every=args.k,
+            refresh_every=args.k if "stale" in args.method else 1,
             img_tau=args.img_tau,
             refresh_on_gripper=not args.no_gripper_refresh,
+            warm_t0=args.warm_t0 if "warm" in args.method else None,
+            warm_steps=args.warm_steps if "warm" in args.method else None,
         )
     methods.instrument(policy, stats, crn=crn, sampler=sampler)
 
@@ -192,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
             "refresh_period": trig.get("period", ""),
             "refresh_image": trig.get("image", ""),
             "refresh_gripper": trig.get("gripper", ""),
+            "n_warm": sampler.n_warm if sampler is not None else "",
+            "n_cold": sampler.n_cold if sampler is not None else "",
             "gpu": loading.gpu_name(),
             "finished_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         }
@@ -230,8 +240,12 @@ def method_name(args) -> str:
     elif args.method == "flow":
         name = f"flow_s{args.flow_steps}"
     else:
-        name = f"stale_k{args.k}" + (f"_tau{args.img_tau}" if args.img_tau is not None else "")
-        name += "" if not args.no_gripper_refresh else "_nogrip"
+        parts = []
+        if "stale" in args.method:
+            parts.append(f"stale_k{args.k}" + (f"_tau{args.img_tau}" if args.img_tau is not None else ""))
+        if "warm" in args.method:
+            parts.append(f"warm_t{args.warm_t0}_m{args.warm_steps}")
+        name = "+".join(parts) + ("_nogrip" if args.no_gripper_refresh else "")
     if args.method != "flow" and args.flow_steps is not None:
         name += f"_s{args.flow_steps}"
     if args.dtype != "native":

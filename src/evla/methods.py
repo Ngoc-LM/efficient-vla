@@ -126,20 +126,61 @@ def should_refresh(
     return img_tau is not None and img_change is not None and img_change > img_tau
 
 
-class StaleVisionSampler:
+def warm_integrate(denoise_fn, noise, prior, t0: float, steps: int):
+    """Euler integration of the flow from t0 (not 1) to 0, starting from a noised prior chunk.
+
+    SmolVLA trains on x_t = t * eps + (1 - t) * a with velocity target u = eps - a and samples by
+    integrating from t = 1 (pure noise) to t = 0. Warm start places the previous chunk, shifted by
+    the executed actions, at time t0 with the same interpolation, then integrates the remaining
+    [t0, 0] interval with `steps` Euler steps (SDEdit-style initialisation for action chunks).
+    """
+    bsize, device = noise.shape[0], noise.device
+    x = t0 * noise + (1.0 - t0) * prior
+    dt = -t0 / steps
+    for i in range(steps):
+        t = torch.full((bsize,), t0 + i * dt, dtype=torch.float32, device=device)
+        x = x + dt * denoise_fn(x, t)
+    return x
+
+
+def shift_chunk(chunk: torch.Tensor, n: int) -> torch.Tensor:
+    """Drop the n executed actions and repeat the last one to keep the chunk length."""
+    if n <= 0:
+        return chunk
+    n = min(n, chunk.shape[1] - 1)
+    return torch.cat([chunk[:, n:], chunk[:, -1:].expand(-1, n, -1)], dim=1)
+
+
+class FastSampler:
+    """Replacement for `VLAFlowMatching.sample_actions` with two independent, combinable options.
+
+    refresh_every=K  reuse the image/language KV cache for K-1 control steps (vision is recomputed
+                     every K steps, on a gripper flip, or when the image changes by more than tau);
+                     K=1 runs the original prefix path unchanged.
+    warm_t0, warm_steps  warm-start the flow from the previous chunk at time t0 with `warm_steps`
+                     Euler steps; the first call of an episode and the call after a gripper flip use
+                     the full cold integration (config.num_steps from t=1).
+    """
+
     def __init__(
         self,
         model,
         stats: CallStats,
-        refresh_every: int = 5,
+        refresh_every: int = 1,
         img_tau: float | None = None,
         refresh_on_gripper: bool = True,
+        warm_t0: float | None = None,
+        warm_steps: int | None = None,
+        shift: int = 1,
     ) -> None:
         self.model = model
         self.stats = stats
         self.refresh_every = int(refresh_every)
         self.img_tau = img_tau
         self.refresh_on_gripper = refresh_on_gripper
+        self.warm_t0 = warm_t0
+        self.warm_steps = warm_steps
+        self.shift = int(shift)
         self.reset()
 
     def reset(self) -> None:
@@ -148,9 +189,13 @@ class StaleVisionSampler:
         self.L_il = 0
         self.steps_since = 0
         self.ref_thumb = None
-        self.forced = False
+        self.forced = False  # vision refresh forced (gripper flip)
+        self.forced_cold = False  # cold integration forced (gripper flip)
         self.last_grip = None
+        self.prev = None
         self.n_refresh_trigger = {"init": 0, "period": 0, "image": 0, "gripper": 0}
+        self.n_warm = 0
+        self.n_cold = 0
 
     def note_action(self, action: torch.Tensor) -> None:
         """Called with every executed env action (after unnormalisation, gripper in [-1, 1]);
@@ -160,19 +205,32 @@ class StaleVisionSampler:
         g = torch.sign(action[..., -1]).detach()
         if self.last_grip is not None and bool((g != self.last_grip).any()):
             self.forced = True
+            self.forced_cold = True
         self.last_grip = g
 
-    @torch.no_grad()
-    def sample_actions(self, images, img_masks, lang_tokens, lang_masks, state, noise=None, **kwargs):
-        from lerobot.policies.common.flow_matching import euler_integrate
+    # -- prefix -------------------------------------------------------------------------------
+    def _prefix_full(self, images, img_masks, lang_tokens, lang_masks, state):
+        """Original SmolVLA prefix: one joint prefill of image, language and state tokens."""
+        from lerobot.policies.common.vla_utils import make_att_2d_masks
+
+        m = self.model
+        embs, pad, att = m.embed_prefix(images, img_masks, lang_tokens, lang_masks, state=state)
+        att2d = make_att_2d_masks(pad, att)
+        pos = torch.cumsum(pad, dim=1) - 1
+        _, cache = m.vlm_with_expert.forward(
+            attention_mask=att2d, position_ids=pos, past_key_values=None,
+            inputs_embeds=[embs, None], use_cache=m.config.use_cache,
+        )
+        self.stats.n_vision_calls += 1
+        self.n_refresh_trigger["period"] += 1
+        return pad, cache
+
+    def _prefix_stale(self, images, img_masks, lang_tokens, lang_masks, state):
         from lerobot.policies.common.vla_utils import make_att_2d_masks
 
         m = self.model
         vwe = m.vlm_with_expert
         bsize, device = state.shape[0], state.device
-        if noise is None:
-            noise = m.sample_noise((bsize, m.config.chunk_size, m.config.max_action_dim), device)
-
         img_change = None
         if self.cache is not None and self.img_tau is not None:
             img_change = float((thumbnails(images) - self.ref_thumb).abs().mean())
@@ -181,12 +239,9 @@ class StaleVisionSampler:
         )
         if refresh:
             reason = (
-                "init"
-                if self.cache is None
-                else "gripper"
-                if self.forced
-                else "period"
-                if self.steps_since >= self.refresh_every
+                "init" if self.cache is None
+                else "gripper" if self.forced
+                else "period" if self.steps_since >= self.refresh_every
                 else "image"
             )
             self.n_refresh_trigger[reason] += 1
@@ -198,11 +253,8 @@ class StaleVisionSampler:
             att2d = make_att_2d_masks(il_pad, il_att)
             pos = torch.cumsum(il_pad, dim=1) - 1
             _, cache = vwe.forward(
-                attention_mask=att2d,
-                position_ids=pos,
-                past_key_values=None,
-                inputs_embeds=[il_embs, None],
-                use_cache=True,
+                attention_mask=att2d, position_ids=pos, past_key_values=None,
+                inputs_embeds=[il_embs, None], use_cache=True,
             )
             self.cache, self.il_pad, self.L_il = cache, il_pad, L
             self.steps_since = 0
@@ -217,26 +269,54 @@ class StaleVisionSampler:
             # match the dtype the concatenated prefix would have had
             state_emb = state_emb.to(torch.promote_types(state_emb.dtype, self._il_dtype()))
 
-        n_valid = self.il_pad.sum(dim=1, keepdim=True).long()  # (B, 1)
-        pos_state = n_valid  # position id of the single state token
+        n_valid = self.il_pad.sum(dim=1, keepdim=True).long()  # (B, 1): position id of the state token
         mask = torch.cat(
             [self.il_pad[:, None, :], torch.ones(bsize, 1, 1, dtype=torch.bool, device=device)], dim=2
         )
-        cache = append_prefix_tokens(vwe, state_emb, mask, pos_state, self.cache)
+        cache = append_prefix_tokens(vwe, state_emb, mask, n_valid, self.cache)
         prefix_pad = torch.cat([self.il_pad, torch.ones(bsize, 1, dtype=torch.bool, device=device)], dim=1)
         self.steps_since += 1
+        return prefix_pad, cache
 
-        return euler_integrate(
-            lambda x_t, t: m.denoise_step(
-                x_t=x_t, prefix_pad_masks=prefix_pad, past_key_values=cache, timestep=t
-            ),
-            noise,
-            m.config.num_steps,
-        )
+    # -- full call ------------------------------------------------------------------------------
+    @torch.no_grad()
+    def sample_actions(self, images, img_masks, lang_tokens, lang_masks, state, noise=None, **kwargs):
+        from lerobot.policies.common.flow_matching import euler_integrate
+
+        m = self.model
+        bsize, device = state.shape[0], state.device
+        if noise is None:
+            noise = m.sample_noise((bsize, m.config.chunk_size, m.config.max_action_dim), device)
+        if self.refresh_every <= 1:
+            prefix_pad, cache = self._prefix_full(images, img_masks, lang_tokens, lang_masks, state)
+            self.forced = False
+        else:
+            prefix_pad, cache = self._prefix_stale(images, img_masks, lang_tokens, lang_masks, state)
+
+        def denoise(x_t, t):
+            return m.denoise_step(x_t=x_t, prefix_pad_masks=prefix_pad, past_key_values=cache, timestep=t)
+
+        if self.warm_t0 is not None and self.prev is not None and not self.forced_cold:
+            x = warm_integrate(denoise, noise, shift_chunk(self.prev, self.shift), self.warm_t0, self.warm_steps)
+            self.n_warm += 1
+        else:
+            x = euler_integrate(denoise, noise, m.config.num_steps)
+            self.n_cold += 1
+            self.forced_cold = False
+        self.prev = x
+        return x
 
     def _il_dtype(self):
         # dtype of image/language embeddings produced by the VLM embedding layers
         return self.model.vlm_with_expert.get_vlm_model().text_model.get_input_embeddings().weight.dtype
+
+
+class StaleVisionSampler(FastSampler):
+    """Vision reuse only (kept for the profiler and tests)."""
+
+    def __init__(self, model, stats, refresh_every: int = 5, img_tau=None, refresh_on_gripper: bool = True):
+        super().__init__(model, stats, refresh_every=max(2, int(refresh_every)), img_tau=img_tau,
+                         refresh_on_gripper=refresh_on_gripper)
 
 
 def append_prefix_tokens(vwe, embs, attention_mask, position_ids, cache):
@@ -275,8 +355,8 @@ def append_prefix_tokens(vwe, embs, attention_mask, position_ids, cache):
     return cache
 
 
-def install_stale(policy, stats: CallStats, **kw) -> StaleVisionSampler:
-    sampler = StaleVisionSampler(policy.model, stats, **kw)
+def install_sampler(policy, stats: CallStats, **kw) -> FastSampler:
+    sampler = FastSampler(policy.model, stats, shift=policy.config.n_action_steps, **kw)
     policy.model.sample_actions = sampler.sample_actions
     orig_reset = policy.reset
 
