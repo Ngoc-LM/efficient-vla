@@ -42,11 +42,11 @@ def main(argv=None) -> int:
     ap.add_argument("--suite", default="libero_spatial")
     ap.add_argument("--task", type=int, default=0)
     ap.add_argument("--init", type=int, default=0)
-    ap.add_argument("--modes", default="native,fp32,native_amp16,fp32_amp16")
+    ap.add_argument("--modes", default="native,fp16,visfp16")
     ap.add_argument("--repeats", type=int, default=100)
     ap.add_argument("--rounds", type=int, default=4)
     ap.add_argument("--warmup", type=int, default=20)
-    ap.add_argument("--flow-steps", default="10,5,3")
+    ap.add_argument("--flow-steps", default="10,3")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
@@ -111,7 +111,9 @@ def main(argv=None) -> int:
             state = pol.prepare_state(batch)
             lang_tokens = batch[OBS_LANGUAGE_TOKENS]
             lang_masks = batch[OBS_LANGUAGE_ATTENTION_MASK]
-            noise = torch.randn(1, m.config.chunk_size, m.config.max_action_dim, device=state.device)
+            g = torch.Generator(device="cpu")
+            g.manual_seed(0)
+            noise = torch.randn(1, m.config.chunk_size, m.config.max_action_dim, generator=g).to(state.device)
 
         def f_vision():
             with torch.inference_mode(), ctx():
@@ -169,6 +171,7 @@ def main(argv=None) -> int:
             a_st = s1.sample_actions(images, img_masks, lang_tokens, lang_masks, state, noise=noise)
             a_st2 = sampler.sample_actions(images, img_masks, lang_tokens, lang_masks, state, noise=noise)
         eq = {
+            "actions_ref": a_ref.float().cpu(),
             "max_abs_diff_refresh_every_step": float((a_ref - a_st).abs().max()),
             "max_abs_diff_cached_same_image": float((a_ref - a_st2).abs().max()),
             "action_abs_mean": float(a_ref.abs().mean()),
@@ -182,8 +185,17 @@ def main(argv=None) -> int:
     for mode in modes:
         base, amp = mode.split("_")[0], mode.endswith("amp16")
         comp[mode] = components(bundles[base], amp)
-        info[f"equivalence_{mode}"] = comp[mode][1]
         info[f"param_dtypes_{base}"] = loading.param_dtypes(bundles[base].policy)
+    # same observation and same flow noise: deviation of each precision mode from the native chunk
+    ref = comp[modes[0]][1]["actions_ref"]
+    for mode in modes:
+        eq = comp[mode][1]
+        a = eq.pop("actions_ref")
+        adim = any_b.policy.config.action_feature.shape[0]
+        eq[f"chunk_max_abs_diff_vs_{modes[0]}"] = float((a - ref)[..., :adim].abs().max())
+        eq[f"chunk_mean_abs_diff_vs_{modes[0]}"] = float((a - ref)[..., :adim].abs().mean())
+        eq["finite"] = bool(torch.isfinite(a).all())
+        info[f"equivalence_{mode}"] = eq
 
     # parameter counts per block
     m0 = any_b.policy.model

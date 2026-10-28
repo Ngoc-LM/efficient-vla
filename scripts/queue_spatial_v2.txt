@@ -1,0 +1,11 @@
+# LIBERO-Spatial, same (task, init state) episodes and flow noise (CRN) as spatial_baseline.
+# H1 chunked execution, H2 gripper-event re-planning, H3 per-call cost (flow steps, fp16 on Turing).
+spatial_ol5            --method open_loop --k 5
+! python -u -m evla.profile --modes native,fp16,visfp16 --flow-steps 10,3 --repeats 60 --rounds 3 --warmup 10 --out /kaggle/working/results/profile/profile_t4_v2.json > /kaggle/working/results/profile/profile_v2.log 2>&1
+spatial_ol10           --method open_loop --k 10
+spatial_ol10_evt       --method open_loop --k 10 --event-trigger --hold 5
+spatial_ol5_s3         --method open_loop --k 5 --flow-steps 3
+spatial_ol10_evt_fast  --method open_loop --k 10 --event-trigger --hold 5 --flow-steps 3 --dtype fp16
+spatial_ol10_x         --method open_loop --k 10 --inits 20-49
+spatial_ol10_evt_x     --method open_loop --k 10 --event-trigger --hold 5 --inits 20-49
+spatial_cold3          --method flow --flow-steps 3

@@ -219,3 +219,58 @@ def test_warm_integrate_matches_euler_from_t1_and_is_exact_on_linear_path():
     for t0, m in [(0.3, 1), (0.5, 3), (0.8, 5)]:
         out = methods.warm_integrate(lambda x, t: (x - a) / t[:, None, None], noise, a, t0, m)
         assert torch.allclose(out, a, atol=1e-5)
+
+
+class _FakePolicy:
+    """Minimal stand-in for SmolVLAPolicy: an action queue refilled with a fixed chunk when empty."""
+
+    def __init__(self, chunk, n_action_steps):
+        from collections import deque
+
+        self.chunk = chunk
+        self._queues = {"action": deque(maxlen=n_action_steps)}
+        self.n_calls = 0
+
+    def select_action(self, batch, noise=None, **kw):
+        q = self._queues["action"]
+        if not q:
+            self.n_calls += 1
+            q.extend(self.chunk[: q.maxlen])
+        return q.popleft()
+
+    def reset(self):
+        self._queues["action"].clear()
+
+
+def _grip_chunk(signs):
+    return [torch.tensor([[0.0] * 6 + [float(s)]]) for s in signs]
+
+
+def test_event_trigger_replans_before_gripper_switch():
+    # chunk: open for 3 steps, then close; executed 10 actions per call
+    pol = _FakePolicy(_grip_chunk([-1, -1, -1, 1, 1, 1, 1, 1, 1, 1]), n_action_steps=10)
+    trig = methods.install_event_trigger(pol, unnormalize=lambda a: a, hold=5)
+    executed = [pol.select_action(None)[0, -1].item() for _ in range(3)]
+    assert executed == [-1, -1, -1]
+    assert trig.n_events == 1 and len(pol._queues["action"]) == 0  # chunk dropped before the switch
+    pol.select_action(None)  # re-plans from the "new observation"
+    assert pol.n_calls == 2
+
+
+def test_event_trigger_hold_and_reset():
+    pol = _FakePolicy(_grip_chunk([-1, 1] * 5), n_action_steps=10)  # chattering chunk
+    trig = methods.install_event_trigger(pol, unnormalize=lambda a: a, hold=3)
+    for _ in range(12):
+        pol.select_action(None)
+    # with hold=3 a trigger can fire at most once every 4 steps
+    assert 1 <= trig.n_events <= 3
+    pol.reset()
+    assert trig.n_events == 0 and trig.since > 10**8
+
+
+def test_no_event_without_switch():
+    pol = _FakePolicy(_grip_chunk([1] * 10), n_action_steps=10)
+    trig = methods.install_event_trigger(pol, unnormalize=lambda a: a, hold=5)
+    for _ in range(25):
+        pol.select_action(None)
+    assert trig.n_events == 0 and pol.n_calls == 3

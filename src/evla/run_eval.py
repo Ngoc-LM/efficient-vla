@@ -39,6 +39,7 @@ FIELDS = [
     "refresh_gripper",
     "n_warm",
     "n_cold",
+    "n_events",
     "gpu",
     "finished_at",
 ]
@@ -65,7 +66,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--flow-steps", type=int, default=None, help="Euler steps (default: checkpoint, 10)")
     ap.add_argument("--img-tau", type=float, default=None, help="stale: image-change refresh threshold")
     ap.add_argument("--no-gripper-refresh", action="store_true")
-    ap.add_argument("--dtype", choices=["native", "fp32"], default="native")
+    ap.add_argument("--dtype", choices=["native", "fp32", "fp16", "visfp16"], default="native")
+    ap.add_argument("--event-trigger", action="store_true", help="re-plan at predicted gripper switches")
+    ap.add_argument("--hold", type=int, default=5, help="event trigger: steps without a new trigger")
     ap.add_argument("--policy", default="HuggingFaceVLA/smolvla_libero")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--seed-base", type=int, default=1000)
@@ -130,6 +133,9 @@ def main(argv: list[str] | None = None) -> int:
             warm_steps=args.warm_steps if "warm" in args.method else None,
         )
     methods.instrument(policy, stats, crn=crn, sampler=sampler)
+    trigger = None
+    if args.event_trigger:
+        trigger = methods.install_event_trigger(policy, b.postprocessor, hold=args.hold)
 
     def post(action):
         a = b.postprocessor(action)
@@ -208,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
             "refresh_gripper": trig.get("gripper", ""),
             "n_warm": sampler.n_warm if sampler is not None else "",
             "n_cold": sampler.n_cold if sampler is not None else "",
+            "n_events": trigger.n_events if trigger is not None else "",
             "gpu": loading.gpu_name(),
             "finished_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         }
@@ -252,6 +259,8 @@ def method_name(args) -> str:
         if "warm" in args.method:
             parts.append(f"warm_t{args.warm_t0}_m{args.warm_steps}")
         name = "+".join(parts) + ("_nogrip" if args.no_gripper_refresh else "")
+    if args.event_trigger:
+        name += f"_evt_h{args.hold}"
     if args.method != "flow" and args.flow_steps is not None:
         name += f"_s{args.flow_steps}"
     if args.dtype != "native":

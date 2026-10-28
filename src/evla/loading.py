@@ -39,8 +39,12 @@ def build(
 ) -> Bundle:
     """Load policy, processors and the LIBERO env config.
 
-    dtype: "native" keeps what LeRobot loads (VLM in bf16, rest fp32); "fp32" casts the whole policy
-    to float32. Other precisions are handled by autocast at call time (see methods.py).
+    dtype (precision of the SmolVLM backbone + action expert; the small state/action projections
+    always stay in float32, as in the released code):
+      native   what LeRobot loads: backbone and expert in bfloat16 (emulated on Turing GPUs such as T4)
+      fp32     whole policy in float32
+      fp16     backbone and expert in float16 (native tensor-core type on T4)
+      visfp16  only the vision encoder + connector in float16, the rest as native
     """
     from lerobot.configs.policies import PreTrainedConfig
     from lerobot.envs import make_env_pre_post_processors
@@ -58,10 +62,7 @@ def build(
     env_cfg = LiberoEnvConfig(task=suite)
     policy = make_policy(cfg=cfg, env_cfg=env_cfg, rename_map={})
     policy.eval()
-    if dtype == "fp32":
-        policy.float()
-    elif dtype != "native":
-        raise ValueError(f"unknown dtype mode {dtype!r}")
+    set_precision(policy, dtype)
 
     preprocessor, postprocessor = make_pre_post_processors(
         policy_cfg=cfg,
@@ -73,6 +74,29 @@ def build(
     )
     env_pre, env_post = make_env_pre_post_processors(env_cfg=env_cfg, policy_cfg=cfg)
     return Bundle(policy, preprocessor, postprocessor, env_pre, env_post, env_cfg, cfg)
+
+
+def set_precision(policy: Any, dtype: str) -> None:
+    vwe = policy.model.vlm_with_expert
+    if dtype == "native":
+        return
+    if dtype == "fp32":
+        policy.float()
+    elif dtype == "fp16":
+        vwe.half()  # SmolVLM (vision + text) and the action expert; projections stay float32
+    elif dtype == "visfp16":
+        vlm = vwe.get_vlm_model()
+        vlm.vision_model.half()
+        vlm.connector.half()
+        text_dtype = vlm.text_model.get_input_embeddings().weight.dtype
+        orig = vwe.embed_image
+
+        def embed_image(image):
+            return orig(image).to(text_dtype)
+
+        vwe.embed_image = embed_image
+    else:
+        raise ValueError(f"unknown dtype mode {dtype!r}")
 
 
 def make_task_env(env_cfg: Any, task_id: int):

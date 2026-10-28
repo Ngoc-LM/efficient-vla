@@ -9,12 +9,22 @@ QUEUE=$1
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT=${OUT_DIR:-/kaggle/working/results/raw}
 COMMON=${COMMON_ARGS:---suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2}
+busy() { pgrep -f -- "-m evla.run_eval" > /dev/null; }
+# never start while another evaluation is still running (e.g. a previous queue)
+while busy; do sleep 60; done
 while read -r NAME ARGS; do
   [[ -z "${NAME:-}" || "$NAME" == \#* ]] && continue
+  if [[ "$NAME" == "!" ]]; then   # raw command line, e.g. a profiling run
+    echo "[$(date +%T)] run: $ARGS"
+    (cd "$HERE/.." && PYTHONPATH=src MUJOCO_GL=egl PYOPENGL_PLATFORM=egl bash -c "$ARGS")
+    echo "[$(date +%T)] done: exit $?"
+    python "$HERE/push_results.py" --src "$(dirname "$OUT")" --dest t4 --message "T4 results: ${ARGS:0:60}" 2>&1 | tail -1
+    continue
+  fi
   echo "[$(date +%T)] start $NAME: $ARGS"
   SHARDS=${SHARDS:-4} bash "$HERE/launch_eval.sh" "$NAME" "${MAX_HOURS:-6}" $COMMON $ARGS
   sleep 30
-  while pgrep -f "evla.run_eval" > /dev/null; do sleep 60; done
+  while busy; do sleep 60; done
   n=$(cat "$OUT/${NAME}"_s*.csv 2>/dev/null | grep -vc '^method')
   echo "[$(date +%T)] done  $NAME: $n episodes"
   python "$HERE/push_results.py" --src "$(dirname "$OUT")" --dest t4 --message "T4 results: $NAME ($n episodes)" 2>&1 | tail -1

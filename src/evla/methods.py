@@ -355,6 +355,62 @@ def append_prefix_tokens(vwe, embs, attention_mask, position_ids, cache):
     return cache
 
 
+class EventTrigger:
+    """Gripper-event-triggered re-planning for open-loop chunk execution.
+
+    The policy executes up to n_action_steps actions of each chunk open loop. After an action is
+    taken from the queue, if the next queued action switches the gripper (open <-> close) relative to
+    the action just executed, the rest of the chunk is dropped, so the policy re-plans from the newest
+    observation exactly at the contact event. To avoid re-creating gripper chatter, no new trigger is
+    allowed for `hold` control steps after a triggered re-plan.
+
+    `unnormalize` maps a normalised action (B, A) to environment units, where the gripper command is
+    the last dimension in [-1, 1] (closing > 0 in LIBERO).
+    """
+
+    def __init__(self, policy, unnormalize, hold: int = 5, action_key: str = "action") -> None:
+        self.policy = policy
+        self.unnormalize = unnormalize
+        self.hold = int(hold)
+        self.action_key = action_key
+        self.reset()
+
+    def reset(self) -> None:
+        self.since = 10**9
+        self.n_events = 0
+
+    def after_select(self, action: torch.Tensor) -> None:
+        q = self.policy._queues[self.action_key]
+        self.since += 1
+        if not q or self.since <= self.hold:
+            return
+        g_now = torch.sign(self.unnormalize(action)[..., -1])
+        g_next = torch.sign(self.unnormalize(q[0])[..., -1])
+        if bool((g_now != g_next).any()):
+            q.clear()
+            self.n_events += 1
+            self.since = 0
+
+
+def install_event_trigger(policy, unnormalize, hold: int = 5) -> EventTrigger:
+    trig = EventTrigger(policy, unnormalize, hold=hold)
+    orig_select = policy.select_action
+    orig_reset = policy.reset
+
+    def select_action(batch, noise=None, **kw):
+        a = orig_select(batch, noise, **kw)
+        trig.after_select(a)
+        return a
+
+    def reset():
+        orig_reset()
+        trig.reset()
+
+    policy.select_action = select_action
+    policy.reset = reset
+    return trig
+
+
 def install_sampler(policy, stats: CallStats, **kw) -> FastSampler:
     sampler = FastSampler(policy.model, stats, shift=policy.config.n_action_steps, **kw)
     policy.model.sample_actions = sampler.sample_actions
