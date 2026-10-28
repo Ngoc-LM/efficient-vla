@@ -30,18 +30,35 @@ def running() -> int:
     return len([x for x in out.split() if x.strip()])
 
 
+def push(out_dir: str, dest: str, msg: str) -> None:
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "push_results.py")
+    p = subprocess.run(
+        ["python", script, "--src", out_dir, "--dest", dest, "--message", msg],
+        capture_output=True,
+        text=True,
+    )
+    print("  push:", (p.stdout + p.stderr).strip().splitlines()[-1:] or "", flush=True)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("out_dir")
     ap.add_argument("--every", type=int, default=120)
+    ap.add_argument("--push-every", type=int, default=0, help="push results every N cycles (0: never)")
+    ap.add_argument("--dest", default="raw")
     args = ap.parse_args()
+    cycle = 0
     while True:
+        cycle += 1
         print(time.strftime("%H:%M:%S"), f"running={running()}", flush=True)
         print(summary(args.out_dir), flush=True)
         for p in sorted(glob.glob(os.path.join(args.out_dir, "*.stdout"))):
             tail = subprocess.run(["tail", "-n", "1", p], capture_output=True, text=True).stdout.strip()
             print("  ", os.path.basename(p), "|", tail[-160:], flush=True)
-        if running() == 0:
+        finished = running() == 0
+        if args.push_every and (cycle % args.push_every == 0 or finished):
+            push(args.out_dir, args.dest, f"Kaggle results checkpoint ({time.strftime('%Y-%m-%d %H:%M')} UTC)")
+        if finished:
             print("no evla.run_eval process left", flush=True)
             break
         time.sleep(args.every)
