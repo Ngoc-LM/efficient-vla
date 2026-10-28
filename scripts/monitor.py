@@ -31,11 +31,19 @@ def running() -> int:
 
 
 def push(out_dir: str, dest: str, msg: str) -> None:
+    try:
+        _push(out_dir, dest, msg)
+    except Exception as e:  # never let a failed push stop the monitor
+        print("  push failed:", type(e).__name__, str(e)[:200], flush=True)
+
+
+def _push(out_dir: str, dest: str, msg: str) -> None:
     script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "push_results.py")
     p = subprocess.run(
         ["python", script, "--src", out_dir, "--dest", dest, "--message", msg],
         capture_output=True,
         text=True,
+        timeout=180,
     )
     print("  push:", (p.stdout + p.stderr).strip().splitlines()[-1:] or "", flush=True)
 

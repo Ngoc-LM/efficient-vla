@@ -70,6 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--seed-base", type=int, default=1000)
     ap.add_argument("--shard", default="0/1")
+    ap.add_argument("--skip-from", default=None, help="glob of CSVs whose finished episodes are skipped")
     ap.add_argument("--out", required=True)
     ap.add_argument("--max-hours", type=float, default=11.0)
     ap.add_argument("--save-actions", action="store_true", help="store executed actions per episode")
@@ -92,6 +93,11 @@ def main(argv: list[str] | None = None) -> int:
     inits = parse_range(args.inits)
     episodes = select_shard([(t, i) for t in tasks for i in inits], args.shard)
     done = load_done(out)
+    if args.skip_from:
+        import glob
+
+        for f in glob.glob(args.skip_from):
+            done |= load_done(f)
     todo = [e for e in episodes if e not in done]
     log(f"start {vars(args)} | shard episodes={len(episodes)} done={len(episodes) - len(todo)}", logf)
     if not todo:

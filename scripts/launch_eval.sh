@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run one evaluation configuration as two shards on the two T4 GPUs of a Kaggle session.
+# Run one evaluation configuration as SHARDS (default 2) processes on the two T4 GPUs of a Kaggle session.
 # Usage: bash scripts/launch_eval.sh <run_name> <max_hours> <run_eval args...>
 #   e.g. bash scripts/launch_eval.sh spatial_baseline 10 --suite libero_spatial --method baseline
 # Processes are started with setsid so that they survive the end of the notebook cell.
@@ -11,8 +11,10 @@ OUT=${OUT_DIR:-/kaggle/working/results/raw}
 mkdir -p "$OUT"
 export PYTHONPATH="$(cd "$(dirname "$0")/.." && pwd)/src:${PYTHONPATH:-}"
 export MUJOCO_GL=egl PYOPENGL_PLATFORM=egl
-for i in 0 1; do
-  setsid -f nohup python -u -m evla.run_eval "$@" --shard "$i/2" --device "cuda:$i" \
+N=${SHARDS:-2}   # processes; shard i runs on GPU i%2 (2 per GPU is faster: batch-1 inference is launch-bound)
+for ((i = 0; i < N; i++)); do
+  setsid -f nohup python -u -m evla.run_eval "$@" --shard "$i/$N" --device "cuda:$((i % 2))" \
+    --skip-from "$OUT/${NAME}_s*.csv" \
     --max-hours "$MAXH" --out "$OUT/${NAME}_s$i.csv" > "$OUT/${NAME}_s$i.stdout" 2>&1 < /dev/null
 done
 sleep 1
