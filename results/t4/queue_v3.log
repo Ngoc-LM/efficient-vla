@@ -1,2 +1,8 @@
 [15:35:06] run: while pgrep -f -- '-m evla[.]profile' > /dev/null; do sleep 30; done
 [15:42:06] done: exit 0
+pushed 473 files -> results/t4 @ 2d80ea9
+[15:42:14] start spatial_cold3: --method flow --flow-steps 3
+3670 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_s0.csv
+3672 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_s1.csv
+3675 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_s2.csv
+3678 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_s3.csv
