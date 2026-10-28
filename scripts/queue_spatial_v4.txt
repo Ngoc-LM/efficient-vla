@@ -1,0 +1,7 @@
+# LIBERO-Spatial, same (task, init state) episodes and flow noise (CRN) as spatial_baseline.
+# Order after profiling v2: fp16 removes the emulated-bf16 cost on Turing, so test the fp16 recipe first.
+spatial_cold3          --method flow --flow-steps 3
+spatial_cold3_fp16     --method flow --flow-steps 3 --dtype fp16
+spatial_stale5_cold3   --method stale --k 5 --flow-steps 3
+spatial_ol5_evt        --method open_loop --k 5 --event-trigger --hold 5
+spatial_ol10           --method open_loop --k 10
