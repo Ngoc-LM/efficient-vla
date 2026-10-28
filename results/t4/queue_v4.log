@@ -25,3 +25,10 @@ pushed 1158 files -> results/t4 @ a531fd0
 6028 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 5 --event-trigger --hold 5 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_ol5_evt_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol5_evt_s2.csv
 6031 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 5 --event-trigger --hold 5 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_ol5_evt_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol5_evt_s3.csv
 [21:04:13] done  spatial_ol5_evt: 200 episodes
+pushed 1386 files -> results/t4 @ 9046c10
+[21:04:37] start spatial_ol10: --method open_loop --k 10
+6717 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 10 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_ol10_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol10_s0.csv
+6719 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 10 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_ol10_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol10_s1.csv
+6722 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 10 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_ol10_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol10_s2.csv
+6725 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method open_loop --k 10 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_ol10_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_ol10_s3.csv
+[21:38:08] done  spatial_ol10: 200 episodes
