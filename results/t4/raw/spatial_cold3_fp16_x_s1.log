@@ -75,3 +75,5 @@
 [04:33:23] t9 i31 success=1 steps=119 calls=119 vision=119 policy=42.3s wall=52.6s | 28/32 SR=0.786 ETA=0.09h
 [04:34:24] t9 i35 success=1 steps=127 calls=127 vision=127 policy=50.3s wall=61.1s | 29/32 SR=0.793 ETA=0.07h
 [04:35:09] t9 i39 success=1 steps=130 calls=130 vision=130 policy=36.2s wall=44.9s | 30/32 SR=0.800 ETA=0.04h
+[04:35:56] t9 i43 success=1 steps=142 calls=142 vision=142 policy=37.9s wall=47.2s | 31/32 SR=0.806 ETA=0.02h
+[04:36:37] t9 i47 success=1 steps=125 calls=125 vision=125 policy=32.9s wall=41.0s | 32/32 SR=0.812 ETA=0.00h
