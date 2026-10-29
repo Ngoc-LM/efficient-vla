@@ -1,18 +1,10 @@
 \section{Introduction}
 \label{sec:intro}
 
-VLA policies map camera images, a language instruction and the robot state to actions with a pretrained vision-language model (VLM) and an action head~\cite{kim2024openvla,black2024pi0,shukor2025smolvla}.
-Their cost is paid inside a control loop: at batch size one, every re-plan waits for the full model before the robot can act.
-Work on efficient VLAs reduces this cost in several places: smaller backbones~\cite{shukor2025smolvla,wen2025tinyvla}, fewer tokens or layers per step~\cite{xu2025vlacache,yang2025efficientvla,yue2024deer}, cheaper action decoding~\cite{pertsch2025fast,kim2025oft}, asynchronous execution~\cite{black2025rtc,sendai2025a2c2}, and inference systems~\cite{ma2025realtime,islam2026onnx}.
-Whether a given saving preserves closed-loop behaviour depends on the checkpoint and the hardware: exporting the SmolVLA checkpoint used here to ONNX cut its median latency by 40\% but, through truncated instructions, also cut LIBERO-Spatial success from 70\% to 41\%~\cite{islam2026onnx}.
+VLA policies map images, a language instruction and the robot state to actions through a pretrained vision-language model (VLM) and an action head~\cite{black2024pi0,shukor2025smolvla}.
+At batch size one inside a control loop, every re-plan waits for the full model.
+Efficient-VLA work reduces this cost with smaller backbones, fewer tokens or layers, cheaper action decoding, asynchronous execution or faster inference systems (\cref{sec:study}), but a saving can change closed-loop behaviour: an ONNX export of the SmolVLA checkpoint used here cut median latency by 40\% and, through truncated instructions, LIBERO-Spatial success from 70\% to 41\%~\cite{islam2026onnx}.
 
-This report examines SmolVLA~\cite{shukor2025smolvla}, a 0.45B-parameter flow-matching VLA designed for affordable hardware, on the LIBERO-Spatial benchmark~\cite{liu2023libero} and a Tesla T4, a GPU without bfloat16 tensor cores.
-The scope is training-free: weights, architecture and benchmark protocol stay fixed, and only how the policy is executed changes.
-The report covers the four parts of the assignment:
-\begin{itemize}
-\item a study of efficient VLAs and of diffusion versus flow-matching action generation, with a literature matrix of 18 verified sources (\cref{sec:study});
-\item a reproduction of the released checkpoint with LeRobot, including the differences from the paper configuration (\cref{sec:reproduce});
-\item an analysis of strengths, limitations, trajectories and computational bottlenecks (\cref{sec:analysis});
-\item an improvement study that tests two hypotheses on identical episodes: re-planning less often, and re-planning more cheaply (\cref{sec:improve}).
-\end{itemize}
-The individual levers that make re-planning cheaper (half precision, fewer flow steps, CUDA graphs) are known~\cite{ma2025realtime,tang2026coda}; the contribution is a measured account of why each one helps on this hardware and a paired closed-loop test of whether the policy still succeeds.
+This report studies SmolVLA~\cite{shukor2025smolvla} on LIBERO-Spatial~\cite{liu2023libero} with a Tesla T4, a GPU without bfloat16 tensor cores, in a training-free setting: weights, architecture and protocol stay fixed, and only the execution changes.
+It surveys efficient VLAs and diffusion versus flow-matching action heads (\cref{sec:study}, with an 18-paper literature matrix), reproduces the released checkpoint (\cref{sec:reproduce}), analyses its strengths, limitations and bottlenecks (\cref{sec:analysis}), and tests two hypotheses on identical episodes: re-planning less often, and re-planning more cheaply (\cref{sec:improve}).
+The levers that make re-planning cheaper are known~\cite{ma2025realtime,tang2026coda}; the contribution is a measured account of why each helps on this hardware and a paired closed-loop test of whether success is preserved.

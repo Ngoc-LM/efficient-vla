@@ -1,0 +1,73 @@
+\section{Reproducibility}
+\label{app:repro}
+
+\paragraph{Environment.}
+\texttt{scripts/kaggle\_setup.sh} installs LeRobot v0.6.1 with the \texttt{smolvla} and \texttt{libero} extras, pins MuJoCo below 3.4, registers the NVIDIA EGL vendor library for headless rendering, and answers LIBERO's first-import prompt.
+Versions: Python 3.13, PyTorch 2.11 (CUDA 12.8), transformers 5.5.4, hf-libero 0.1.4, MuJoCo 3.3.7.
+
+\paragraph{Evaluation.}
+\texttt{python -m evla.run\_eval} runs one configuration on a list of (task, initial state) episodes and appends one CSV row per episode, so that interrupted runs resume and runs from several sessions can be concatenated.
+Each episode uses the environment seed $1000+e$ with $e=1000\cdot\text{task}+\text{init}$, and the flow noise of the re-plan at control step $k$ is drawn from a generator seeded with $10^4 e+k$ for every method (common random numbers).
+\texttt{scripts/run\_queue.sh} runs a list of configurations as four processes on the two GPUs and pushes partial results every 20 minutes.
+\texttt{python -m evla.analyze} produces the paired comparisons, \texttt{python -m evla.bench\_graph} the latency table, and \texttt{python -m evla.profile} the component breakdown.
+
+\paragraph{Variants.}
+\cref{tab:variants} lists the command-line options of every evaluated variant.
+
+\begin{table}[h]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Variant & \texttt{run\_eval} options \\
+\midrule
+Released & \texttt{--method baseline} \\
+Open loop & \texttt{--method open\_loop --k 5} (or 10) \\
+Gripper events & \texttt{... --event-trigger --hold 5} \\
+Stale image & \texttt{--method stale --k 5 --flow-steps 3} \\
+Fewer steps & \texttt{--method flow --flow-steps 3} \\
+Float16 & \texttt{... --dtype fp16} \\
+CUDA graph & \texttt{... --graph} \\
+Fixed noise & \texttt{... --fixed-noise} \\
+\bottomrule
+\end{tabular}
+\caption{Evaluated variants.}
+\label{tab:variants}
+\end{table}
+
+\section{Additional Results}
+\label{app:results}
+
+\paragraph{Per-task success.}
+\cref{tab:pertask} gives the number of successful episodes out of 20 per task for each variant on initial states 0--19.
+
+\begin{table}[h]
+\centering\small
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}lrrrrrrrrrr@{}}
+\toprule
+Task & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+\midrule
+Released & 14 & 19 & 13 & 10 & 16 & 19 & 15 & 16 & 17 & 15 \\
+bf16, $S{=}3$ & 15 & 18 & 15 & 14 & 15 & 18 & 14 & 15 & 19 & 15 \\
+fp16, $S{=}3$ & 15 & 18 & 17 & 15 & 15 & 17 & 14 & 12 & 17 & 14 \\
+Open loop $k{=}5$ & 12 & 14 & 13 & 11 & 13 & 13 & 12 & 11 & 16 & 14 \\
+$k{=}5$ + events & 12 & 16 & 10 & 12 & 13 & 17 & 12 & 12 & 15 & 11 \\
+Stale image & 11 & 13 & 17 & 12 & 13 & 16 & 11 & 13 & 12 & 12 \\
+Open loop $k{=}10$ & 15 & 15 & 12 & 9 & 12 & 15 & 17 & 11 & 14 & 15 \\
+\bottomrule
+\end{tabular}
+\caption{Successful episodes out of 20 per LIBERO-Spatial task.}
+\label{tab:pertask}
+\end{table}
+
+\paragraph{Failure categories.}
+Failures of the released policy are categorised from the executed gripper commands, since object poses are not logged: a grasp is a switch from open to closed.
+\emph{Released off target}: the episode ends with the gripper open after one or two grasps (28 of 46).
+\emph{Holding at timeout}: the gripper is closed at the step limit (9).
+\emph{Repeated grasps}: three or more grasps (9).
+
+\paragraph{Warm-started flow (rejected before closed-loop tests).}
+Starting the integration from the previous chunk, shifted by one step and re-noised to flow time $t_0$, was calibrated offline on 586 control steps of five LIBERO-Object episodes.
+The deviation of the first action from a 10-step integration with the same noise was 0.83, 0.53 and 0.34 for $t_0=0.3, 0.5, 0.7$ (3 steps), against 0.32 for a cold start with 3 steps and 0.51 with 2 steps; the shifted previous chunk alone deviated by 1.31, and a 10-step integration with different noise by 1.37.
+A warm start was therefore no more accurate than a cold start with the same number of steps and was not evaluated in closed loop.

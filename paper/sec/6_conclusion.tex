@@ -1,16 +1,8 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-For the released LIBERO checkpoint of SmolVLA on a Tesla T4, the cost of a re-plan is set less by FLOPs than by two execution overheads: emulated bfloat16 arithmetic and the launch-bound flow loop of the action expert.
-Sharing computation across control steps lowers success by about 12 points, whereas removing the two overheads and the discretisation slack reduces a re-plan from 789 to 112\,ms with bit-exact graph replay and unchanged success on 200 paired episodes.
+For the released SmolVLA checkpoint on a T4, the cost of a re-plan is set less by FLOPs than by emulated bfloat16 and a launch-bound flow loop.
+Sharing computation across steps lowers success by about 12 points, whereas removing these overheads and the discretisation slack makes a re-plan $7.0\times$ cheaper without a measurable loss on 200 paired episodes.
 \pending{Update with the 500-pair decision and the $S$-curve.}
-
-\paragraph{Limitations.}
-The study covers one checkpoint, one LIBERO suite and one GPU type, in simulation.
-The reproduced baseline (77.0\%) is below the 90\% reported for the paper configuration of SmolVLA, which differs from the released checkpoint (\cref{sec:reproduce}).
-The precision gain does not carry over to GPUs with bfloat16 tensor cores, and the step and graph gains were not measured on other hardware.
-
-\paragraph{Future work.}
-The remaining latency lies in the vision-language prefix (84 of 112\,ms).
-Reducing it requires changing the model, for example distilling the policy into a shallower language model or a cheaper vision encoder, followed by the same paired closed-loop test.
-Measurements on an embedded GPU and on exported runtimes (ONNX, TensorRT) should use the same test, since a faster runtime can change closed-loop behaviour~\cite{islam2026onnx}.
+\textbf{Limitations:} one checkpoint, one LIBERO suite, one GPU type and simulation only; the baseline (77.0\%) is below the 90\% of the paper configuration.
+\textbf{Future work:} the remaining 84\,ms lie in the vision-language prefix, which calls for distillation into a smaller backbone, and embedded GPUs or exported runtimes should be evaluated with the same paired closed-loop test~\cite{islam2026onnx}.

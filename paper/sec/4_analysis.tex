@@ -2,16 +2,14 @@
 \label{sec:analysis}
 
 \paragraph{Computational bottlenecks.}
-\cref{tab:profile} breaks down one re-plan on a T4 (batch 1, CUDA events, warm-up, interleaved rounds, median of 60 calls).
-Three observations follow.
-(i) The simulator is not the bottleneck: one LIBERO step (physics and rendering of two cameras) takes 32\,ms, against 814\,ms for the policy.
-(ii) The vision encoder costs 230\,ms in the released bfloat16 weights but 39\,ms in float16 with identical weights: Turing GPUs have no bfloat16 tensor cores, so bfloat16 matrix products are emulated.
-(iii) The action expert accounts for 18\% of the FLOPs of a re-plan but 63\% of its latency ($10\times 51$\,ms), and its per-step time is the same in bfloat16 and float16.
-A denoising pass is small (50 action tokens, 11.5\,GFLOP) but launches several hundred kernels; at batch size 1 the GPU waits on kernel launches rather than on arithmetic.
+\cref{tab:profile} breaks down one re-plan (CUDA events, warm-up, median of 60 calls).
+The simulator is not the bottleneck (32\,ms per step against 814\,ms for the policy).
+The vision encoder takes 230\,ms in the released bfloat16 weights but 39\,ms in float16: Turing GPUs have no bfloat16 tensor cores and emulate it.
+The action expert accounts for 18\% of the FLOPs of a re-plan but 63\% of its latency ($10\times51$\,ms), and its step time is the same in both precisions: a pass over 50 action tokens is only 11.5\,GFLOP but launches several hundred kernels, so at batch one the GPU waits on launches rather than arithmetic.
 
 \begin{table}[t]
-\centering\small
-\setlength{\tabcolsep}{2.5pt}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 Component (one re-plan) & GFLOP & bf16 (ms) & fp16 (ms) \\
@@ -20,30 +18,26 @@ Vision encoder, 2 cameras & 431 & 230 & 39 \\
 Prefix incl.\ vision (32 LM layers) & 527 & 304 & 82 \\
 One expert pass (flow step) & 11.5 & 51 & 52 \\
 Re-plan, $S{=}10$ (released) & 642 & 814 & 605 \\
-Re-plan, $S{=}3$ & 562 & 458 & 243 \\
-\midrule
 Simulator step (CPU + EGL) & -- & \multicolumn{2}{c}{32} \\
 \bottomrule
 \end{tabular}
-\caption{Cost of one re-plan on a Tesla T4 (median latency of isolated components, one profiling run; the end-to-end re-plan times of \cref{tab:latency}, measured in a separate run, agree within 3\%).}
+\caption{Cost of one re-plan on a Tesla T4 (isolated components, one profiling run; end-to-end times in \cref{tab:latency} come from a separate run and agree within 3\%).}
 \label{tab:profile}
 \end{table}
 
 \paragraph{Successful and failed trajectories.}
-Successful episodes finish in a median of 100 steps; every failure runs to the 280-step limit.
-All 46 failures contain at least one grasp attempt.
-From the executed gripper commands (a proxy, since object poses are not logged), 28 failures release the bowl away from the goal after one or two grasps, 9 end while still holding the bowl, and 9 repeat the grasp three or more times.
-Failures are uneven across tasks: task~3 (bowl on the cookie box) fails in 10 of its 20 episodes, tasks~1 and~5 in one each.
-Re-planning at every step with fresh flow noise makes consecutive chunks differ about as much as independent samples. Measured on 581 control steps of LIBERO-Object (a suite used only for calibration), at a fixed observation two 10-step chunks with different noise differ by 1.37 (L2 norm of the first action, normalised units), and the previous chunk shifted by one step differs from the current one by 1.31.
-The gripper command chatters accordingly: failed episodes contain 12.6 gripper segments of at most 3 steps per 100 steps against 2.7 in successes, and every failure has at least three such segments.
+Successes finish in a median of 100 steps; all 46 failures run to the 280-step limit after at least one grasp.
+From the executed gripper commands (object poses are not logged), 28 failures release the bowl off target after one or two grasps, 9 still hold it at the limit, and 9 grasp three or more times; task~3 (bowl on the cookie box) fails in 10 of 20 episodes.
+Fresh flow noise at every re-plan makes consecutive chunks differ about as much as independent samples: on 581 calibration steps of LIBERO-Object, two 10-step chunks for the same observation with different noise differ by 1.37 (L2 norm of the first normalised action), and the shifted previous chunk differs from the current one by 1.31.
+The gripper command chatters accordingly: failed episodes contain 12.6 gripper segments of at most 3 steps per 100 steps, successful ones 2.7.
 
 \paragraph{Strengths.}
-\textbf{S1 Small footprint.} 605M parameters, 1.16\,GB of weights and 21\,MB of activations per re-plan in float16 fit a single 16\,GB T4 with room for several processes.
-\textbf{S2 Prefix caching.} The language model processes the observation once per re-plan and the expert reads its cached keys and values, so an additional flow step costs 52\,ms against 304\,ms for the prefix.
-\textbf{S3 Few-step flow.} The linear flow path makes the integration robust to coarse discretisation: with $S{=}3$ the first action deviates from the $S{=}10$ result by 0.32 (normalised L2, LIBERO-Object), four times less than the sampling spread of the policy (1.37), and SR on LIBERO-Spatial does not drop (\cref{sec:improve}).
+\textbf{S1 Small footprint:} 1.16\,GB of weights and 21\,MB of activations per re-plan (float16) fit a 16\,GB T4 with room for several processes.
+\textbf{S2 Prefix caching:} the expert reuses the cached prefix, so a flow step costs 52\,ms against 304\,ms for the prefix.
+\textbf{S3 Few-step flow:} with $S{=}3$ the first action deviates from $S{=}10$ by 0.32, a quarter of the sampling spread (1.37), and SR does not drop (\cref{sec:improve}).
 
 \paragraph{Limitations.}
-\textbf{L1 Precision mismatch on older GPUs.} bfloat16 weights run emulated on Turing; the vision encoder is $5.9\times$ slower than in float16 (\cref{tab:profile}).
-\textbf{L2 Launch-bound expert.} The expert loop uses a small fraction of the GPU and dominates latency at batch 1.
-\textbf{L3 Dependence on fresh visual input.} This checkpoint needs a new image at every step: executing 5 actions per chunk loses 12.5 points of SR, and re-planning every step with fresh proprioception but a 5-step-old image loses 12.0 points (\cref{sec:improve}). Compute cannot be amortised across steps, so an episode needs about 150 full re-plans.
-\textbf{L4 Temporally inconsistent actions.} Independent noise at every re-plan produces gripper chatter, which is concentrated in failures.
+\textbf{L1 Precision mismatch:} bfloat16 weights run emulated on Turing.
+\textbf{L2 Launch-bound expert:} the flow loop dominates latency at batch one while using little arithmetic.
+\textbf{L3 Need for fresh images:} executing 5 actions per chunk, or re-planning with fresh proprioception but a 5-step-old image, loses 12.0--12.5 points (\cref{sec:improve}), so an episode needs a full re-plan at every step.
+\textbf{L4 Temporally inconsistent actions:} independent noise at every re-plan produces gripper chatter, concentrated in failures.

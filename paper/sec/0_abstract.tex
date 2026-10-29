@@ -1,12 +1,8 @@
 \begin{abstract}
-Vision-language-action (VLA) policies that re-plan at every control step pay the full cost of the model at every step.
-This report studies where that cost goes, and which ways of reducing it preserve closed-loop success, for the released LIBERO checkpoint of SmolVLA on a Tesla T4.
-The released configuration needs 789\,ms per re-plan, 24 times the simulator step.
-Two overheads dominate: bfloat16 arithmetic, which Turing GPUs emulate, and the 10-step flow-matching loop of the action expert, whose small kernels leave the GPU waiting on kernel launches.
-Methods are compared on identical episodes with common random numbers and paired tests.
-Re-planning less often fails: executing 5 actions per chunk, re-planning at predicted gripper switches, or reusing a 5-step-old image all lower success by 12.0--12.5 points (Holm-adjusted $p\le0.012$).
-Re-planning more cheaply succeeds: float16 weights, 3 Euler steps and a CUDA-graph replay of the flow loop cut a re-plan to 112\,ms ($7.0\times$); the graph is bit-exact, and success is unchanged on 200 paired episodes (77.0\% vs 77.0\%).
+A vision-language-action (VLA) policy that re-plans at every control step pays for the whole model at every step.
+This report measures where that cost goes for the released LIBERO checkpoint of SmolVLA on a Tesla T4, and tests which ways of reducing it preserve closed-loop success.
+A re-plan takes 789\,ms, dominated by emulated bfloat16 arithmetic and a launch-bound 10-step flow loop.
+On identical episodes with paired tests, re-planning less often (open-loop chunks, gripper-event triggers, a 5-step-old image) lowers success by 12.0--12.5 points (Holm $p\le0.012$), whereas re-planning more cheaply (float16, 3 Euler steps, a bit-exact CUDA-graph replay) cuts a re-plan to 112\,ms ($7.0\times$) with unchanged success on 200 episodes (77.0\% vs 77.0\%).
 \pending{500-pair non-inferiority result.}
-The remaining 84\,ms is the vision-language prefix, which fixes the next target.
 Code: \url{https://github.com/Ngoc-LM/efficient-vla}.
 \end{abstract}
