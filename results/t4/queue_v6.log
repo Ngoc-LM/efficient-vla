@@ -14,3 +14,4 @@ pushed 1948 files -> results/t4 @ 86a5159
 2260 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s2.csv
 2262 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s3.csv
 pushed 1988 files -> results/t4 @ e66125a
+pushed 2015 files -> results/t4 @ 78be432
