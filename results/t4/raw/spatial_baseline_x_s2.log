@@ -40,3 +40,11 @@
 [07:12:44] t5 i20 success=1 steps=105 calls=105 vision=105 policy=139.8s wall=154.2s | 38/75 SR=0.632 ETA=2.47h
 [07:14:56] t5 i24 success=1 steps=92 calls=92 vision=92 policy=122.1s wall=131.7s | 39/75 SR=0.641 ETA=2.37h
 [07:17:14] t5 i28 success=1 steps=94 calls=94 vision=94 policy=127.8s wall=137.9s | 40/75 SR=0.650 ETA=2.28h
+[07:23:52] t5 i32 success=0 steps=280 calls=280 vision=280 policy=375.6s wall=398.6s | 41/75 SR=0.634 ETA=2.26h
+[07:26:11] t5 i36 success=1 steps=94 calls=94 vision=94 policy=129.0s wall=138.8s | 42/75 SR=0.643 ETA=2.17h
+[07:28:37] t5 i40 success=1 steps=102 calls=102 vision=102 policy=135.0s wall=145.8s | 43/75 SR=0.651 ETA=2.08h
+[07:30:44] t5 i44 success=1 steps=88 calls=88 vision=88 policy=118.0s wall=127.1s | 44/75 SR=0.659 ETA=2.00h
+[07:32:56] t5 i48 success=1 steps=92 calls=92 vision=92 policy=122.2s wall=131.7s | 45/75 SR=0.667 ETA=1.92h
+[07:35:33] t6 i22 success=1 steps=107 calls=107 vision=107 policy=143.6s wall=157.3s | 46/75 SR=0.674 ETA=1.84h
+[07:38:01] t6 i26 success=1 steps=103 calls=103 vision=103 policy=137.9s wall=147.6s | 47/75 SR=0.681 ETA=1.76h
+[07:40:37] t6 i30 success=1 steps=109 calls=109 vision=109 policy=145.6s wall=155.8s | 48/75 SR=0.688 ETA=1.69h
