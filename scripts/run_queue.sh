@@ -24,7 +24,13 @@ while read -r NAME ARGS; do
   echo "[$(date +%T)] start $NAME: $ARGS"
   SHARDS=${SHARDS:-4} bash "$HERE/launch_eval.sh" "$NAME" "${MAX_HOURS:-6}" $COMMON $ARGS
   sleep 30
-  while busy; do sleep 60; done
+  t=0
+  while busy; do   # push partial results regularly so a lost session costs little
+    sleep 60; t=$((t + 1))
+    if (( t % ${PUSH_EVERY_MIN:-20} == 0 )); then
+      python "$HERE/push_results.py" --src "$(dirname "$OUT")" --dest t4 --message "T4 results: $NAME (in progress)" 2>&1 | tail -1
+    fi
+  done
   n=$(cat "$OUT/${NAME}"_s*.csv 2>/dev/null | grep -vc '^method')
   echo "[$(date +%T)] done  $NAME: $n episodes"
   python "$HERE/push_results.py" --src "$(dirname "$OUT")" --dest t4 --message "T4 results: $NAME ($n episodes)" 2>&1 | tail -1

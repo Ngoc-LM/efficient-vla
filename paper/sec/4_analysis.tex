@@ -1,0 +1,49 @@
+\section{Analysis}
+\label{sec:analysis}
+
+\paragraph{Computational bottlenecks.}
+\cref{tab:profile} breaks down one re-plan on a T4 (batch 1, CUDA events, warm-up, interleaved rounds, median of 60 calls).
+Three observations follow.
+(i) The simulator is not the bottleneck: one LIBERO step (physics and rendering of two cameras) takes 32\,ms, against 814\,ms for the policy.
+(ii) The vision encoder costs 230\,ms in the released bfloat16 weights but 39\,ms in float16 with identical weights: Turing GPUs have no bfloat16 tensor cores, so bfloat16 matrix products are emulated.
+(iii) The action expert accounts for 18\% of the FLOPs of a re-plan but 63\% of its latency ($10\times 51$\,ms), and its per-step time is the same in bfloat16 and float16.
+A denoising pass is small (50 action tokens, 11.5\,GFLOP) but launches several hundred kernels; at batch size 1 the GPU waits on kernel launches rather than on arithmetic.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Component (one re-plan) & GFLOP & bf16 (ms) & fp16 (ms) \\
+\midrule
+Vision encoder, 2 cameras & 431 & 230 & 39 \\
+Prefix incl.\ vision (32 LM layers) & 527 & 304 & 82 \\
+One expert pass (flow step) & 11.5 & 51 & 52 \\
+Re-plan, $S{=}10$ (released) & 642 & 814 & 605 \\
+Re-plan, $S{=}3$ & 562 & 458 & 243 \\
+\midrule
+Simulator step (CPU + EGL) & -- & \multicolumn{2}{c}{32} \\
+\bottomrule
+\end{tabular}
+\caption{Cost of one re-plan on a Tesla T4 (median latency).}
+\label{tab:profile}
+\end{table}
+
+\paragraph{Successful and failed trajectories.}
+Successful episodes finish in a median of 100 steps; every failure runs to the 280-step limit.
+All 46 failures contain at least one grasp attempt.
+From the executed gripper commands (a proxy, since object poses are not logged), 28 failures release the bowl away from the goal after one or two grasps, 9 end while still holding the bowl, and 9 repeat the grasp three or more times.
+Failures concentrate on task~3 (bowl on the cookie box, 10/20) and task~2 (13/20).
+Re-planning at every step with fresh flow noise makes consecutive actions nearly independent samples. Measured on 581 control steps of LIBERO-Object (a suite we use only for calibration), at a fixed observation two 10-step chunks with different noise differ by 1.37 (L2 norm of the first action, normalised units), and the previous chunk shifted by one step differs from the current one by 1.31.
+The gripper command chatters accordingly: failed episodes contain 12.6 gripper segments of at most 3 steps per 100 steps against 2.7 in successes, and every failure has at least three such segments.
+
+\paragraph{Strengths.}
+\textbf{S1 Small footprint.} 605M parameters, 1.16\,GB of weights and 21\,MB of activations per re-plan in float16 fit a single 16\,GB T4 with room for several processes.
+\textbf{S2 Prefix caching.} The language model processes the observation once per re-plan and the expert reads its cached keys and values, so an additional flow step costs 52\,ms against 304\,ms for the prefix.
+\textbf{S3 Few-step flow.} The linear flow path makes the integration robust to coarse discretisation: with $S{=}3$ the first action deviates from the $S{=}10$ result by 0.32 (normalised L2, LIBERO-Object), four times less than the sampling spread of the policy (1.37), and SR on LIBERO-Spatial does not drop (\cref{sec:improve}).
+
+\paragraph{Limitations.}
+\textbf{L1 Precision mismatch on older GPUs.} bfloat16 weights run emulated on Turing; the vision encoder is $5.9\times$ slower than in float16 (\cref{tab:profile}).
+\textbf{L2 Launch-bound expert.} The expert loop uses a small fraction of the GPU and dominates latency at batch 1.
+\textbf{L3 Dependence on fresh visual input.} This checkpoint needs a new image at every step: executing 5 actions per chunk loses 12.5 points of SR, and re-planning every step with fresh proprioception but a 5-step-old image loses 12.0 points (\cref{sec:improve}). Compute cannot be amortised across steps, so an episode needs about 150 full re-plans.
+\textbf{L4 Temporally inconsistent actions.} Independent noise at every re-plan produces gripper chatter, which is concentrated in failures.

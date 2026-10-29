@@ -1,5 +1,5 @@
 # Day 2 (Thu): CUDA-graph prototype, power for the main claim, flow-steps curve (all fp16 unless noted).
-! python -u -m evla.bench_graph --modes native,fp16 --steps 10,3,2,1 --out /kaggle/working/results/profile/graph_t4.json > /kaggle/working/results/profile/graph_t4.log 2>&1
+# done: ! python -u -m evla.bench_graph --modes native,fp16 --steps 10,3,2,1 --out /kaggle/working/results/profile/graph_t4.json > /kaggle/working/results/profile/graph_t4.log 2>&1
 spatial_cold3_fp16_x   --method flow --flow-steps 3 --dtype fp16 --inits 20-49
 spatial_baseline_x     --method baseline --inits 20-49
 spatial_fp16_s2        --method flow --flow-steps 2 --dtype fp16

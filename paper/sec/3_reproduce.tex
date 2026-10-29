@@ -1,0 +1,59 @@
+\section{Reproduction}
+\label{sec:reproduce}
+
+\paragraph{Model and checkpoint.}
+We use the released LeRobot implementation of SmolVLA~\cite{shukor2025smolvla} (v0.6.1) and the LIBERO-finetuned checkpoint \texttt{HuggingFaceVLA/smolvla\_libero}.
+The checkpoint is not the configuration reported in the paper: it keeps all 32 decoder layers of the SmolVLM2-500M backbone instead of the first 16, uses an action expert of width $0.5\times$ instead of $0.75\times$, and re-plans at every control step ($n_\text{exec}{=}1$ executed action per predicted chunk).
+It has $605$M parameters ($86$M vision encoder, $12$M connector, $362$M language model, $97$M action expert), stored in bfloat16.
+
+\paragraph{Pipeline.}
+At control step $k$ the policy receives two RGB images (third-person and wrist cameras, rotated by $180^\circ$ and resized with padding to $512{\times}512$), the task instruction (at most 48 tokens), and an 8-D proprioceptive state $\mathbf{s}_k$ (end-effector position, axis-angle orientation, two gripper joints).
+SigLIP encodes each image, a pixel-shuffle connector compresses it to a short token sequence, and the prefix [image tokens; language tokens; state token] is processed once by the language model, whose per-layer keys and values are cached.
+The action expert is a smaller transformer that predicts a chunk of $H{=}50$ actions $\mathbf{A}\in\mathbb{R}^{H\times 7}$ (end-effector delta pose and gripper command); its layers alternate cross-attention to the cached prefix and self-attention over action tokens.
+
+\paragraph{Training objective.}
+SmolVLA is trained with conditional flow matching on a linear path between data and noise.
+With $\boldsymbol\epsilon\sim\mathcal N(0,I)$, $\tau\sim\mathrm{Beta}(1.5,1)$ rescaled to $[0.001,1]$, and $\mathbf{A}^\tau=\tau\boldsymbol\epsilon+(1-\tau)\mathbf{A}$, the expert $v_\theta$ regresses the constant velocity of the path,
+\begin{equation}
+\mathcal{L}(\theta)=\mathbb{E}_{\tau,\boldsymbol\epsilon}\big\|v_\theta(\mathbf{A}^\tau,\tau\mid\mathbf{o})-(\boldsymbol\epsilon-\mathbf{A})\big\|_2^2 .
+\label{eq:fm}
+\end{equation}
+
+\paragraph{Action generation.}
+At inference the chunk is obtained by integrating $d\mathbf{A}/d\tau=v_\theta$ from $\tau{=}1$ (noise) to $\tau{=}0$ with $S$ forward-Euler steps, $\mathbf{A}\leftarrow\mathbf{A}-\tfrac1S\,v_\theta(\mathbf{A},\tau\mid\mathbf{o})$; the released configuration uses $S{=}10$.
+Each re-plan therefore costs one prefix pass (vision, language model) and $S$ expert passes that reuse the prefix cache.
+The first $n_\text{exec}$ actions are unnormalised and executed by the operational-space controller at 20\,Hz.
+
+\paragraph{Evaluation metric.}
+Success rate (SR): the fraction of episodes in which the goal predicate of the task (\eg \texttt{On(bowl, plate)}) holds before the step limit (280 steps on LIBERO-Spatial).
+Each episode is fixed by a (task, stored initial state) pair.
+We evaluate the 10 LIBERO-Spatial tasks on initial states 0--19 (200 episodes; 0--49 for the main comparison) and compare methods \emph{paired} on identical episodes, with common random numbers: the flow noise at control step $k$ of an episode is seeded by (episode, $k$) for every method.
+
+\paragraph{Setup and differences from the original work.}
+\cref{tab:setup} lists the setup.
+Three differences matter.
+(i) The checkpoint configuration above differs from the paper.
+(ii) We pin MuJoCo to 3.3.7: from 3.4.0 the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}.
+(iii) We use 20 episodes per task instead of 10, a T4 GPU, and the LeRobot evaluation loop.
+Our SR of 77.0\% [70.7, 82.3] (Wilson 95\% CI) is below the 90\% reported for the paper configuration~\cite{shukor2025smolvla} but inside the range obtained by others with this checkpoint (70--83\%)~\cite{lerobot2354} and equal to the value reported for SmolVLA at $n_\text{exec}{=}1$ on LIBERO-Spatial in~\cite{sendai2025a2c2}.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Item & Setting \\
+\midrule
+Checkpoint & \texttt{HuggingFaceVLA/smolvla\_libero} \\
+Code & LeRobot v0.6.1 (\texttt{7e241bd}), PyTorch 2.11 \\
+Simulator & LIBERO (hf-libero 0.1.4), MuJoCo 3.3.7, EGL \\
+Hardware & Kaggle, 2$\times$ Tesla T4 (16\,GB), 4 vCPU \\
+Precision & bfloat16 backbone (released); float16 (ours) \\
+Episodes & 10 tasks $\times$ 20 (or 50) stored initial states \\
+Flow steps $S$ & 10 (released); 3, 2, 1 (ours) \\
+Re-planning & every step, $n_\text{exec}{=}1$ (released) \\
+\bottomrule
+\end{tabular}
+\caption{Reproduction setup.}
+\label{tab:setup}
+\end{table}
