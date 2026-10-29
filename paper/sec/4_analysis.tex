@@ -11,7 +11,7 @@ A denoising pass is small (50 action tokens, 11.5\,GFLOP) but launches several h
 
 \begin{table}[t]
 \centering\small
-\setlength{\tabcolsep}{3.5pt}
+\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 Component (one re-plan) & GFLOP & bf16 (ms) & fp16 (ms) \\
@@ -34,7 +34,7 @@ Successful episodes finish in a median of 100 steps; every failure runs to the 2
 All 46 failures contain at least one grasp attempt.
 From the executed gripper commands (a proxy, since object poses are not logged), 28 failures release the bowl away from the goal after one or two grasps, 9 end while still holding the bowl, and 9 repeat the grasp three or more times.
 Failures are uneven across tasks: task~3 (bowl on the cookie box) fails in 10 of its 20 episodes, tasks~1 and~5 in one each.
-Re-planning at every step with fresh flow noise makes consecutive actions nearly independent samples. Measured on 581 control steps of LIBERO-Object (a suite we use only for calibration), at a fixed observation two 10-step chunks with different noise differ by 1.37 (L2 norm of the first action, normalised units), and the previous chunk shifted by one step differs from the current one by 1.31.
+Re-planning at every step with fresh flow noise makes consecutive chunks differ about as much as independent samples. Measured on 581 control steps of LIBERO-Object (a suite used only for calibration), at a fixed observation two 10-step chunks with different noise differ by 1.37 (L2 norm of the first action, normalised units), and the previous chunk shifted by one step differs from the current one by 1.31.
 The gripper command chatters accordingly: failed episodes contain 12.6 gripper segments of at most 3 steps per 100 steps against 2.7 in successes, and every failure has at least three such segments.
 
 \paragraph{Strengths.}

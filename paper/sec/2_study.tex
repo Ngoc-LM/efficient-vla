@@ -1,0 +1,44 @@
+\section{Efficient VLAs and Action Generation}
+\label{sec:study}
+
+\paragraph{Where efficient VLAs save cost.}
+\cref{tab:study} groups the efficiency work in the literature matrix (18 sources, each read from the paper itself; delivered as a spreadsheet) by the part of the inference loop it changes.
+Three assumptions recur.
+Token and layer reduction assumes redundancy: consecutive frames share most visual content~\cite{xu2025vlacache}, or easy situations need fewer layers~\cite{yue2024deer}; both save compute only in the language model, not in the vision encoder.
+Chunked and asynchronous execution assumes that actions predicted from an older observation remain valid; SmolVLA's asynchronous mode shortened task completion by 30\% but lowered success from 78.3\% to 73.3\%~\cite{shukor2025smolvla}, and A2C2 adds a trained correction head to restore reactivity~\cite{sendai2025a2c2}.
+Systems work assumes that the model stays numerically the same, which an export can violate~\cite{islam2026onnx}.
+Two open questions follow for this study.
+First, speed-ups are usually reported next to aggregate success rates, yet a non-significant difference is not evidence of equivalence~\cite{islam2026onnx}; this study therefore fixes a non-inferiority margin in advance and tests it on paired episodes.
+Second, most latencies are measured on GPUs with native bfloat16 support (RTX 4090, A100, A40), so it is unclear which bottleneck dominates on older or embedded GPUs.
+
+\begin{table}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}p{1.55cm}p{2.05cm}p{3.95cm}@{}}
+\toprule
+Lever & Examples & Reported effect (hardware) \\
+\midrule
+Smaller model & SmolVLA~\cite{shukor2025smolvla}, TinyVLA~\cite{wen2025tinyvla} & 0.45B params, LIBERO avg 87.3; 14 vs 292\,ms per action against OpenVLA (A6000) \\
+Fewer tokens or layers & VLA-Cache~\cite{xu2025vlacache}, EfficientVLA~\cite{yang2025efficientvla}, DeeR~\cite{yue2024deer} & $1.63\times$ (OpenVLA, LIBERO, 4090); $1.93\times$ at 28.9\% FLOPs, $-0.6$ SR (A40); LLM FLOPs $5.2$--$6.5\times$ lower (trained) \\
+Action decoding & FAST~\cite{pertsch2025fast}, OFT~\cite{kim2025oft}, CogACT~\cite{li2024cogact} & up to $5\times$ faster training but 750 vs 100\,ms per chunk; $26\times$ throughput; VLM runs once, small DiT denoises \\
+Execution & RTC~\cite{black2025rtc}, A2C2~\cite{sendai2025a2c2} & tolerates $>$300\,ms delay at +21\,ms per chunk; 4.7\,ms head per step \\
+Systems & Realtime-VLA~\cite{ma2025realtime}, ONNX~\cite{islam2026onnx}, Coda~\cite{tang2026coda} & $\pi_0$ 106.5$\to$27.3\,ms (4090); 40\% lower median latency with an SR drop; 2-step flow with a learned corrector \\
+\bottomrule
+\end{tabular}
+\caption{Efficiency levers in the literature matrix (selection). Numbers as reported by each paper.}
+\label{tab:study}
+\end{table}
+
+\paragraph{Diffusion versus flow matching.}
+Both families learn to transform Gaussian noise $\boldsymbol\epsilon$ into an action chunk $\mathbf A$ conditioned on the observation $\mathbf o$.
+Diffusion heads (Diffusion Policy~\cite{chi2023diffusion}, CogACT~\cite{li2024cogact}) use the DDPM forward process $\mathbf A_k=\sqrt{\bar\alpha_k}\,\mathbf A+\sqrt{1-\bar\alpha_k}\,\boldsymbol\epsilon$ and train a network to predict the injected noise~\cite{ho2020ddpm},
+\begin{equation}
+\mathcal L_\text{DDPM}=\mathbb E_{k,\boldsymbol\epsilon}\big\|\boldsymbol\epsilon-\boldsymbol\epsilon_\theta(\mathbf A_k,k\mid\mathbf o)\big\|^2 .
+\end{equation}
+Flow-matching heads ($\pi_0$~\cite{black2024pi0}, SmolVLA) interpolate linearly between noise and data and regress the constant velocity of that path~\cite{lipman2023flow} (\cref{eq:fm}).
+The two differ in four respects.
+(i) \emph{Target}: noise versus velocity.
+(ii) \emph{Path}: the linear interpolation gives each training pair a constant velocity, which yields straighter sampling trajectories than diffusion paths and favours coarse ODE steps~\cite{lipman2023flow}; on RoboTwin, Coda reports $\pi_{0.5}$ at 71.3\% with 3 flow steps against 71.5\% with 10, and 59.8\% with one~\cite{tang2026coda}.
+(iii) \emph{Sampler}: Diffusion Policy samples with 100 DDPM steps in simulation and with 10 DDIM~\cite{song2021ddim} steps on the real robot, CogACT with 10 DDIM steps and classifier-free guidance, while flow models integrate the ODE with 10 forward-Euler steps.
+(iv) \emph{Architecture}: Diffusion Policy repeats its whole denoising network (9--80M parameters) on visual features computed once; CogACT, $\pi_0$ and SmolVLA run a large VLM once and repeat only a head (a DiT conditioned on one cognition feature, or an action expert that attends to the cached VLM keys and values).
+In the last three, the cost of one step is set by the size of the head and, at batch size one, by kernel-launch overhead, which \cref{sec:analysis} measures.

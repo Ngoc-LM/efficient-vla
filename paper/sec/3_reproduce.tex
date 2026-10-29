@@ -2,7 +2,7 @@
 \label{sec:reproduce}
 
 \paragraph{Model and checkpoint.}
-We use the released LeRobot implementation of SmolVLA~\cite{shukor2025smolvla} (v0.6.1) and the LIBERO-finetuned checkpoint \texttt{HuggingFaceVLA/smolvla\_libero}.
+The study uses the released LeRobot implementation of SmolVLA~\cite{shukor2025smolvla} (v0.6.1) and the LIBERO-finetuned checkpoint \texttt{HuggingFaceVLA/smolvla\_libero}.
 The checkpoint is not the configuration reported in the paper: it keeps all 32 decoder layers of the SmolVLM2-500M backbone instead of the first 16, uses an action expert of width $0.5\times$ instead of $0.75\times$, and re-plans at every control step ($n_\text{exec}{=}1$ executed action per predicted chunk).
 It has $605$M parameters ($86$M vision encoder, $12$M connector, $362$M language model, $97$M action expert), stored in bfloat16.
 
@@ -27,15 +27,15 @@ The first $n_\text{exec}$ actions are unnormalised and executed by the operation
 \paragraph{Evaluation metric.}
 Success rate (SR): the fraction of episodes in which the goal predicate of the task (\eg \texttt{On(bowl, plate)}) holds before the step limit (280 steps on LIBERO-Spatial).
 Each episode is fixed by a (task, stored initial state) pair.
-We evaluate the 10 LIBERO-Spatial tasks on initial states 0--19 (200 episodes; 0--49 for the main comparison) and compare methods \emph{paired} on identical episodes, with common random numbers: the flow noise at control step $k$ of an episode is seeded by (episode, $k$) for every method.
+The 10 LIBERO-Spatial tasks are evaluated on initial states 0--19 (200 episodes; 0--49 for the main comparison), and methods are compared \emph{paired} on identical episodes, with common random numbers: the flow noise at control step $k$ of an episode is seeded by (episode, $k$) for every method.
 
 \paragraph{Setup and differences from the original work.}
 \cref{tab:setup} lists the setup.
 Three differences matter.
 (i) The checkpoint configuration above differs from the paper.
-(ii) We pin MuJoCo to 3.3.7: from 3.4.0 the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}.
-(iii) We use 20 episodes per task instead of 10, a T4 GPU, and the LeRobot evaluation loop.
-Our SR of 77.0\% [70.7, 82.3] (Wilson 95\% CI) is below the 90\% reported for the paper configuration~\cite{shukor2025smolvla} but inside the range obtained by others with this checkpoint (70--83\%)~\cite{lerobot2354} and equal to the value reported for SmolVLA at $n_\text{exec}{=}1$ on LIBERO-Spatial in~\cite{sendai2025a2c2}.
+(ii) MuJoCo is pinned to 3.3.7: from 3.4.0 the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}.
+(iii) The evaluation uses 20 episodes per task instead of 10, a T4 GPU, and the LeRobot evaluation loop.
+The reproduced SR of 77.0\% [70.7, 82.3] (Wilson 95\% CI) is below the 90\% reported for the paper configuration~\cite{shukor2025smolvla} but inside the range obtained by others with this checkpoint (70--83\%)~\cite{lerobot2354,islam2026onnx}; A2C2 reports the same 77\% for a SmolVLA trained from scratch on LIBERO with $n_\text{exec}{=}1$~\cite{sendai2025a2c2}.
 
 \begin{table}[t]
 \centering\small
