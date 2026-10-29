@@ -3,3 +3,9 @@
 [04:47:31] t0 i23 success=0 steps=280 calls=280 vision=280 policy=380.7s wall=414.4s | 1/75 SR=0.000 ETA=8.55h
 [04:54:22] t0 i27 success=0 steps=280 calls=280 vision=280 policy=385.4s wall=410.2s | 2/75 SR=0.000 ETA=8.39h
 [04:56:07] t0 i31 success=1 steps=69 calls=69 vision=69 policy=96.4s wall=104.6s | 3/75 SR=0.333 ETA=6.21h
+[05:03:01] t0 i35 success=0 steps=280 calls=280 vision=280 policy=388.0s wall=413.5s | 4/75 SR=0.250 ETA=6.63h
+[05:04:55] t0 i39 success=1 steps=76 calls=76 vision=76 policy=106.0s wall=114.4s | 5/75 SR=0.400 ETA=5.68h
+[05:06:44] t0 i43 success=1 steps=73 calls=73 vision=73 policy=99.9s wall=108.7s | 6/75 SR=0.500 ETA=5.01h
+[05:13:36] t0 i47 success=0 steps=280 calls=280 vision=280 policy=388.2s wall=412.1s | 7/75 SR=0.429 ETA=5.35h
+[05:16:03] t1 i21 success=1 steps=96 calls=96 vision=96 policy=132.7s wall=146.1s | 8/75 SR=0.500 ETA=4.95h
+[05:18:43] t1 i25 success=1 steps=107 calls=107 vision=107 policy=148.6s wall=159.8s | 9/75 SR=0.556 ETA=4.66h

@@ -2,3 +2,9 @@ method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,p
 baseline,libero_spatial,0,23,1023,0,280,280,280,380.6935,1350.543,414.41,,,,,,,,Tesla T4,2026-10-29T04:47:30
 baseline,libero_spatial,0,27,1027,0,280,280,280,385.382,1374.512,410.21,,,,,,,,Tesla T4,2026-10-29T04:54:21
 baseline,libero_spatial,0,31,1031,1,69,69,69,96.3731,1393.599,104.56,,,,,,,,Tesla T4,2026-10-29T04:56:07
+baseline,libero_spatial,0,35,1035,0,280,280,280,388.0001,1376.339,413.49,,,,,,,,Tesla T4,2026-10-29T05:03:01
+baseline,libero_spatial,0,39,1039,1,76,76,76,105.9665,1391.706,114.39,,,,,,,,Tesla T4,2026-10-29T05:04:55
+baseline,libero_spatial,0,43,1043,1,73,73,73,99.9494,1369.291,108.66,,,,,,,,Tesla T4,2026-10-29T05:06:44
+baseline,libero_spatial,0,47,1047,0,280,280,280,388.1631,1384.018,412.06,,,,,,,,Tesla T4,2026-10-29T05:13:36
+baseline,libero_spatial,1,21,2021,1,96,96,96,132.7317,1374.112,146.08,,,,,,,,Tesla T4,2026-10-29T05:16:03
+baseline,libero_spatial,1,25,2025,1,107,107,107,148.6275,1387.393,159.75,,,,,,,,Tesla T4,2026-10-29T05:18:43

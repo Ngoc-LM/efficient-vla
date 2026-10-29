@@ -8,3 +8,7 @@
 [04:56:51] t0 i40 success=1 steps=67 calls=67 vision=67 policy=90.6s wall=98.1s | 6/75 SR=0.833 ETA=3.12h
 [04:58:37] t0 i44 success=1 steps=71 calls=71 vision=71 policy=97.7s wall=105.5s | 7/75 SR=0.857 ETA=2.92h
 [05:00:23] t0 i48 success=1 steps=72 calls=72 vision=72 policy=97.8s wall=105.8s | 8/75 SR=0.875 ETA=2.76h
+[05:02:57] t1 i22 success=1 steps=102 calls=102 vision=102 policy=140.1s wall=154.0s | 9/75 SR=0.889 ETA=2.73h
+[05:09:45] t1 i26 success=0 steps=280 calls=280 vision=280 policy=382.5s wall=407.0s | 10/75 SR=0.800 ETA=3.16h
+[05:16:35] t1 i30 success=0 steps=280 calls=280 vision=280 policy=387.4s wall=410.5s | 11/75 SR=0.727 ETA=3.49h
+[05:18:55] t1 i34 success=1 steps=95 calls=95 vision=95 policy=129.7s wall=139.5s | 12/75 SR=0.750 ETA=3.35h
