@@ -1,0 +1,7 @@
+# Relaunch of v5 after the session loss of 29 Oct (the running copy predated periodic pushes).
+# Order: main non-inferiority pair first, then the flow-steps curve. The CUDA-graph in-loop check
+# and any further probe are added in a follow-up queue once decided.
+spatial_cold3_fp16_x   --method flow --flow-steps 3 --dtype fp16 --inits 20-49
+spatial_baseline_x     --method baseline --inits 20-49
+spatial_fp16_s2        --method flow --flow-steps 2 --dtype fp16
+spatial_fp16_s1        --method flow --flow-steps 1 --dtype fp16
