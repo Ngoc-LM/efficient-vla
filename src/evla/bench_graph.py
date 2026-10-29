@@ -142,7 +142,7 @@ def main(argv=None) -> int:
             print(f"[{mode}] steps={s:2d} eager {x['eager_ms']['p50']:7.1f} ms | graph {x['graph_ms']['p50']:7.1f} ms "
                   f"| x{x['speedup_p50']:.2f} | max|da| {x['graph_vs_released_max']:.2e} | capture {x['capture_s']:.2f}s",
                   flush=True)
-        del sampler, b, pol, m
+        sampler = b = pol = m = None  # free the model before the next mode
         torch.cuda.empty_cache()
 
     with open(args.out, "w") as f:
