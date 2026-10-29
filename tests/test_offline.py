@@ -274,3 +274,26 @@ def test_no_event_without_switch():
     for _ in range(25):
         pol.select_action(None)
     assert trig.n_events == 0 and pol.n_calls == 3
+
+
+def test_static_prefix_cache_matches_dynamic_append_and_crop():
+    torch.manual_seed(0)
+
+    class _Dyn:
+        def __init__(self, layers):
+            self.layers = [methods._KV(k, v) for k, v in layers]
+
+    dyn = _Dyn([(torch.randn(1, 2, 7, 4), torch.randn(1, 2, 7, 4)) for _ in range(3)])
+    st = methods.StaticPrefixCache(dyn)
+    st.load(dyn)
+    k_new, v_new = torch.randn(1, 2, 5, 4), torch.randn(1, 2, 5, 4)
+    k, v = st.update(k_new, v_new, 1)
+    assert torch.equal(k, torch.cat([dyn.layers[1].keys, k_new], 2))
+    assert torch.equal(v, torch.cat([dyn.layers[1].values, v_new], 2))
+    st.crop(7)  # no state change
+    assert st.layers[1].keys.shape[2] == 7 and torch.equal(st.layers[1].keys, dyn.layers[1].keys)
+    # buffers keep their address when a new prefix is loaded
+    ptr = st.layers[0].keys.data_ptr()
+    dyn2 = _Dyn([(torch.randn(1, 2, 7, 4), torch.randn(1, 2, 7, 4)) for _ in range(3)])
+    st.load(dyn2)
+    assert st.layers[0].keys.data_ptr() == ptr and torch.equal(st.layers[0].keys, dyn2.layers[0].keys)

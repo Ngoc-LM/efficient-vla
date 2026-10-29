@@ -68,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-gripper-refresh", action="store_true")
     ap.add_argument("--dtype", choices=["native", "fp32", "fp16", "visfp16"], default="native")
     ap.add_argument("--event-trigger", action="store_true", help="re-plan at predicted gripper switches")
+    ap.add_argument("--graph", action="store_true", help="replay the flow integration from a CUDA graph")
     ap.add_argument("--hold", type=int, default=5, help="event trigger: steps without a new trigger")
     ap.add_argument("--policy", default="HuggingFaceVLA/smolvla_libero")
     ap.add_argument("--device", default="cuda")
@@ -132,6 +133,10 @@ def main(argv: list[str] | None = None) -> int:
             warm_t0=args.warm_t0 if "warm" in args.method else None,
             warm_steps=args.warm_steps if "warm" in args.method else None,
         )
+    if args.graph:
+        if sampler is not None:
+            raise SystemExit("--graph cannot be combined with stale/warm samplers")
+        methods.install_graph(policy, stats)
     methods.instrument(policy, stats, crn=crn, sampler=sampler)
     trigger = None
     if args.event_trigger:
@@ -265,6 +270,8 @@ def method_name(args) -> str:
         name += f"_s{args.flow_steps}"
     if args.dtype != "native":
         name += f"_{args.dtype}"
+    if args.graph:
+        name += "_graph"
     return name
 
 

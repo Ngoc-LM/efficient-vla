@@ -422,3 +422,144 @@ def install_sampler(policy, stats: CallStats, **kw) -> FastSampler:
 
     policy.reset = reset
     return sampler
+
+
+# ----------------------------------------------------------------------------------------------
+# CUDA-graph replay of the flow integration (exact; attacks the kernel-launch-bound expert loop)
+# ----------------------------------------------------------------------------------------------
+
+
+class _KV:
+    def __init__(self, keys: torch.Tensor, values: torch.Tensor) -> None:
+        self.keys, self.values = keys, values
+
+
+class StaticPrefixCache:
+    """Fixed-address copy of the prefix KV cache with the interface `denoise_step` uses.
+
+    `update` returns [prefix; suffix] without storing (the expert's self-attention layers append the
+    action tokens and the original code crops them again after each step), and `crop` is a no-op, so
+    a denoising step has no Python-side state and can be captured in a CUDA graph.
+    """
+
+    def __init__(self, like) -> None:
+        self.layers = [_KV(torch.empty_like(l.keys), torch.empty_like(l.values)) for l in like.layers]
+
+    def load(self, cache) -> None:
+        for dst, src in zip(self.layers, cache.layers, strict=True):
+            dst.keys.copy_(src.keys)
+            dst.values.copy_(src.values)
+
+    def update(self, key_states, value_states, layer_idx):
+        layer = self.layers[layer_idx]
+        return torch.cat([layer.keys, key_states], dim=2), torch.cat([layer.values, value_states], dim=2)
+
+    def crop(self, max_length: int) -> None:
+        return None
+
+
+def make_graph_safe_embed_suffix(m):
+    """Same computation as `VLAFlowMatching.embed_suffix`, without the host-to-device tensor
+    creation (`torch.tensor(list)`) that cannot be recorded in a CUDA graph."""
+    from lerobot.policies.common.vla_utils import create_sinusoidal_pos_embedding
+
+    masks: dict = {}
+
+    def embed_suffix(noisy_actions, timestep):
+        action_emb = m.action_in_proj(noisy_actions)
+        device, bsize, dtype = action_emb.device, action_emb.shape[0], action_emb.dtype
+        time_emb = create_sinusoidal_pos_embedding(
+            timestep, m.vlm_with_expert.expert_hidden_size, m.config.min_period, m.config.max_period, device=device
+        ).type(dtype=dtype)
+        time_emb = time_emb[:, None, :].expand_as(action_emb)
+        x = torch.cat([action_emb, time_emb], dim=2)
+        x = m.action_time_mlp_out(F.silu(m.action_time_mlp_in(x)))
+        key = (bsize, x.shape[1], str(device), x.dtype)
+        if key not in masks:  # created eagerly during warm-up, reused inside the graph
+            masks[key] = (
+                torch.ones(bsize, x.shape[1], dtype=torch.bool, device=device),
+                torch.ones(bsize, m.config.chunk_size, dtype=x.dtype, device=device),
+            )
+        pad, att = masks[key]
+        return x, pad, att
+
+    return embed_suffix
+
+
+class GraphedFlowSampler:
+    """`sample_actions` with the prefix computed eagerly and the whole Euler integration
+    (num_steps expert passes) replayed from one CUDA graph per (prefix shape, num_steps)."""
+
+    def __init__(self, model, stats: CallStats | None = None, warmup: int = 2) -> None:
+        self.model = model
+        self.stats = stats
+        self.warmup = warmup
+        self.graphs: dict = {}
+        model.embed_suffix = make_graph_safe_embed_suffix(model)
+
+    def reset(self) -> None:  # graphs are kept across episodes (same shapes within a task)
+        return None
+
+    def prefix(self, images, img_masks, lang_tokens, lang_masks, state):
+        from lerobot.policies.common.vla_utils import make_att_2d_masks
+
+        m = self.model
+        embs, pad, att = m.embed_prefix(images, img_masks, lang_tokens, lang_masks, state=state)
+        att2d = make_att_2d_masks(pad, att)
+        pos = torch.cumsum(pad, dim=1) - 1
+        _, cache = m.vlm_with_expert.forward(
+            attention_mask=att2d, position_ids=pos, past_key_values=None,
+            inputs_embeds=[embs, None], use_cache=True,
+        )
+        return pad, cache
+
+    def _capture(self, pad, cache, noise):
+        m = self.model
+        steps = int(m.config.num_steps)
+        kv = StaticPrefixCache(cache)
+        kv.load(cache)
+        s_pad, s_noise = pad.clone(), noise.clone()
+        dt = -1.0 / steps
+        times = [torch.full((noise.shape[0],), 1.0 + i * dt, dtype=torch.float32, device=noise.device)
+                 for i in range(steps)]
+
+        def run():
+            x = s_noise
+            for i in range(steps):
+                v = m.denoise_step(x_t=x, prefix_pad_masks=s_pad, past_key_values=kv, timestep=times[i])
+                x = x + dt * v
+            return x
+
+        side = torch.cuda.Stream()
+        side.wait_stream(torch.cuda.current_stream())
+        with torch.cuda.stream(side):
+            for _ in range(self.warmup):
+                run()
+        torch.cuda.current_stream().wait_stream(side)
+        graph = torch.cuda.CUDAGraph()
+        with torch.cuda.graph(graph):
+            out = run()
+        return {"graph": graph, "kv": kv, "pad": s_pad, "noise": s_noise, "out": out, "times": times}
+
+    @torch.no_grad()
+    def sample_actions(self, images, img_masks, lang_tokens, lang_masks, state, noise=None, **kwargs):
+        m = self.model
+        if noise is None:
+            noise = m.sample_noise((state.shape[0], m.config.chunk_size, m.config.max_action_dim), state.device)
+        pad, cache = self.prefix(images, img_masks, lang_tokens, lang_masks, state)
+        key = (tuple(pad.shape), tuple(noise.shape), int(m.config.num_steps),
+               tuple(tuple(l.keys.shape) for l in cache.layers[:1]))
+        g = self.graphs.get(key)
+        if g is None:
+            g = self.graphs[key] = self._capture(pad, cache, noise)
+        g["kv"].load(cache)
+        g["pad"].copy_(pad)
+        g["noise"].copy_(noise)
+        g["graph"].replay()
+        return g["out"].clone()
+
+
+def install_graph(policy, stats: CallStats | None = None) -> GraphedFlowSampler:
+    sampler = GraphedFlowSampler(policy.model, stats)
+    policy.model.sample_actions = sampler.sample_actions
+    return sampler
