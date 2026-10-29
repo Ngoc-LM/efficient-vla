@@ -3,10 +3,10 @@
 
 \paragraph{Efficiency levers.}
 \cref{tab:study} groups the efficiency work in the literature matrix by the part of the inference loop it changes.
-Token and layer reduction assumes redundancy across frames~\cite{xu2025vlacache} or easy situations~\cite{yue2024deer} and saves compute only in the language model.
+Token and layer reduction assumes redundancy across frames~\cite{xu2026vla} or easy situations~\cite{yue2024deer} and saves compute only in the language model.
 Chunked and asynchronous execution assumes that actions predicted from an older observation stay valid; SmolVLA's asynchronous mode finished tasks 30\% faster but lowered success from 78.3\% to 73.3\%~\cite{shukor2025smolvla}.
-Systems work assumes the model stays numerically the same, which an export can violate~\cite{islam2026onnx}.
-Two questions remain open: speed-ups are reported next to aggregate success rates, although a non-significant difference is not equivalence~\cite{islam2026onnx}, and most latencies come from GPUs with native bfloat16 (RTX 4090, A100, A40).
+Systems work assumes the model stays numerically the same, which an export can violate~\cite{islam2026faster}.
+Two questions remain open: speed-ups are reported next to aggregate success rates, although a non-significant difference is not equivalence~\cite{islam2026faster}, and most latencies come from GPUs with native bfloat16 (RTX 4090, A100, A40).
 
 \begin{table}[t]
 \centering\scriptsize
@@ -16,10 +16,10 @@ Two questions remain open: speed-ups are reported next to aggregate success rate
 Lever & Examples & Reported effect (hardware) \\
 \midrule
 Smaller model & SmolVLA~\cite{shukor2025smolvla}, TinyVLA~\cite{wen2025tinyvla} & 0.45B, LIBERO avg 87.3; 14 vs 292\,ms per action vs OpenVLA (A6000) \\
-Fewer tokens or layers & VLA-Cache~\cite{xu2025vlacache}, EfficientVLA~\cite{yang2025efficientvla}, DeeR~\cite{yue2024deer} & $1.63\times$ (4090); $1.93\times$ at 28.9\% FLOPs, $-0.6$ SR (A40); LLM FLOPs $5.2$--$6.5\times$ lower (trained) \\
-Action decoding & FAST~\cite{pertsch2025fast}, OFT~\cite{kim2025oft}, CogACT~\cite{li2024cogact} & $\le5\times$ faster training, 750 vs 100\,ms per chunk; $26\times$ throughput; VLM once, small DiT denoises \\
-Execution & RTC~\cite{black2025rtc}, A2C2~\cite{sendai2025a2c2} & $>$300\,ms delay tolerated, +21\,ms per chunk; 4.7\,ms trained head per step \\
-Systems & Realtime-VLA~\cite{ma2025realtime}, ONNX~\cite{islam2026onnx}, Coda~\cite{tang2026coda} & $\pi_0$ 106.5$\to$27.3\,ms (4090); $-40$\% latency, SR drop; 2 flow steps + learned corrector \\
+Fewer tokens or layers & VLA-Cache~\cite{xu2026vla}, EfficientVLA~\cite{yang2026efficientvla}, DeeR~\cite{yue2024deer} & $1.63\times$ (4090); $1.93\times$ at 28.9\% FLOPs, $-0.6$ SR (A40); LLM FLOPs $5.2$--$6.5\times$ lower (trained) \\
+Action decoding & FAST~\cite{pertsch2025fast}, OFT~\cite{kim2025fine}, CogACT~\cite{li2024cogact} & $\le5\times$ faster training, 750 vs 100\,ms per chunk; $26\times$ throughput; VLM once, small DiT denoises \\
+Execution & RTC~\cite{black2026real}, A2C2~\cite{sendai2025leave} & $>$300\,ms delay tolerated, +21\,ms per chunk; 4.7\,ms trained head per step \\
+Systems & Realtime-VLA~\cite{ma2025running}, ONNX~\cite{islam2026faster}, Coda~\cite{tang2026fewer} & $\pi_0$ 106.5$\to$27.3\,ms (4090); $-40$\% latency, SR drop; 2 flow steps + learned corrector \\
 \bottomrule
 \end{tabular}
 \caption{Efficiency levers (selection of the literature matrix), as reported by each paper.}
@@ -28,7 +28,7 @@ Systems & Realtime-VLA~\cite{ma2025realtime}, ONNX~\cite{islam2026onnx}, Coda~\c
 
 \paragraph{Diffusion versus flow matching.}
 Both turn Gaussian noise $\boldsymbol\epsilon$ into an action chunk $\mathbf A$ conditioned on the observation $\mathbf o$.
-Diffusion heads~\cite{chi2023diffusion,li2024cogact} noise the data as $\mathbf A_k=\sqrt{\bar\alpha_k}\mathbf A+\sqrt{1-\bar\alpha_k}\boldsymbol\epsilon$ and predict the noise~\cite{ho2020ddpm}; flow-matching heads~\cite{black2024pi0,shukor2025smolvla} interpolate linearly, $\mathbf A^\tau=\tau\boldsymbol\epsilon+(1-\tau)\mathbf A$, and regress the velocity of that path~\cite{lipman2023flow}:
+Diffusion heads~\cite{chi2025diffusion,li2024cogact} noise the data as $\mathbf A_k=\sqrt{\bar\alpha_k}\mathbf A+\sqrt{1-\bar\alpha_k}\boldsymbol\epsilon$ and predict the noise~\cite{ho2020denoising}; flow-matching heads~\cite{black2024pi_0,shukor2025smolvla} interpolate linearly, $\mathbf A^\tau=\tau\boldsymbol\epsilon+(1-\tau)\mathbf A$, and regress the velocity of that path~\cite{lipman2022flow}:
 \begin{align}
 \mathcal L_\text{DDPM}&=\mathbb E\,\big\|\boldsymbol\epsilon-\boldsymbol\epsilon_\theta(\mathbf A_k,k\mid\mathbf o)\big\|^2,\\
 \mathcal L_\text{FM}&=\mathbb E\,\big\|(\boldsymbol\epsilon-\mathbf A)-v_\theta(\mathbf A^\tau,\tau\mid\mathbf o)\big\|^2 .
@@ -36,6 +36,6 @@ Diffusion heads~\cite{chi2023diffusion,li2024cogact} noise the data as $\mathbf 
 \end{align}
 They differ in four respects.
 (i) Target: noise versus velocity.
-(ii) Path: the linear path gives each training pair a constant velocity and yields straighter sampling trajectories~\cite{lipman2023flow}; on RoboTwin, $\pi_{0.5}$ keeps 71.3\% success with 3 flow steps against 71.5\% with 10, and drops to 59.8\% with one~\cite{tang2026coda}.
-(iii) Sampler: Diffusion Policy uses 100 DDPM steps in simulation and 10 DDIM~\cite{song2021ddim} steps on the robot, CogACT 10 DDIM steps with guidance, flow models 10 Euler steps.
+(ii) Path: the linear path gives each training pair a constant velocity and yields straighter sampling trajectories~\cite{lipman2022flow}; on RoboTwin, $\pi_{0.5}$ keeps 71.3\% success with 3 flow steps against 71.5\% with 10, and drops to 59.8\% with one~\cite{tang2026fewer}.
+(iii) Sampler: Diffusion Policy uses 100 DDPM steps in simulation and 10 DDIM~\cite{song2020denoising} steps on the robot, CogACT 10 DDIM steps with guidance, flow models 10 Euler steps.
 (iv) Architecture: Diffusion Policy repeats its whole denoiser; CogACT, $\pi_0$ and SmolVLA run the VLM once and repeat only a head on its cached output, and for SmolVLA such a step is dominated by kernel launches at batch one (\cref{sec:analysis}).

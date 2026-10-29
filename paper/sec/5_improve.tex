@@ -60,7 +60,7 @@ fp16, $S{=}1$ & 100 & \pending{--} & \pending{--} & \pending{--} \\
 \paragraph{Re-planning less lowers success (H1 rejected).}
 Calling the vision encoder about five times less often costs 12.0--12.5 points of SR (\cref{tab:sr}); with $k{=}10$ the drop of 9.5 points is not significant after adjustment.
 The event trigger removes most gripper chatter (1.2 short segments per 100 steps against 5.0) without recovering success, and fresh proprioception does not substitute for a current image.
-A SmolVLA trained from scratch on LIBERO benefits from longer execution horizons~\cite{sendai2025a2c2}; this checkpoint, fine-tuned with $n_\text{exec}{=}1$, does not.
+A SmolVLA trained from scratch on LIBERO benefits from longer execution horizons~\cite{sendai2025leave}; this checkpoint, fine-tuned with $n_\text{exec}{=}1$, does not.
 
 \paragraph{Re-planning more cheaply preserves success (H2).}
 Along released $\to$ float16 $\to$ $S{=}3$ $\to$ graph, a re-plan takes 789, 616, 245 and 112\,ms, factors of 1.28, 2.51 and 2.19 ($7.05\times$ in total; \cref{tab:latency}).
