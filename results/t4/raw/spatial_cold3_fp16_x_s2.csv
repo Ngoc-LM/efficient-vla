@@ -1,0 +1,17 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+flow_s3_fp16,libero_spatial,0,22,1022,0,280,280,280,129.854,454.583,195.01,,,,,,,,Tesla T4,2026-10-29T02:43:11
+flow_s3_fp16,libero_spatial,0,26,1026,1,73,73,73,33.5696,458.464,42.79,,,,,,,,Tesla T4,2026-10-29T02:43:55
+flow_s3_fp16,libero_spatial,0,30,1030,1,75,75,75,33.8333,448.638,43.39,,,,,,,,Tesla T4,2026-10-29T02:44:39
+flow_s3_fp16,libero_spatial,0,34,1034,1,71,71,71,32.2945,454.405,41.27,,,,,,,,Tesla T4,2026-10-29T02:45:21
+flow_s3_fp16,libero_spatial,0,38,1038,0,280,280,280,129.2551,460.42,154.74,,,,,,,,Tesla T4,2026-10-29T02:47:55
+flow_s3_fp16,libero_spatial,0,42,1042,1,77,77,77,34.7955,452.426,44.31,,,,,,,,Tesla T4,2026-10-29T02:48:41
+flow_s3_fp16,libero_spatial,0,46,1046,1,74,74,74,32.8341,441.329,41.38,,,,,,,,Tesla T4,2026-10-29T02:49:22
+flow_s3_fp16,libero_spatial,1,20,2020,1,107,107,107,46.8648,437.045,61.74,,,,,,,,Tesla T4,2026-10-29T02:50:24
+flow_s3_fp16,libero_spatial,1,24,2024,1,101,101,101,48.243,477.947,59.45,,,,,,,,Tesla T4,2026-10-29T02:51:24
+flow_s3_fp16,libero_spatial,1,28,2028,1,100,100,100,48.0485,479.914,59.52,,,,,,,,Tesla T4,2026-10-29T02:52:23
+flow_s3_fp16,libero_spatial,1,32,2032,1,103,103,103,48.6198,471.082,60.25,,,,,,,,Tesla T4,2026-10-29T02:53:24
+flow_s3_fp16,libero_spatial,1,36,2036,1,101,101,101,47.7379,469.681,59.07,,,,,,,,Tesla T4,2026-10-29T02:54:23
+flow_s3_fp16,libero_spatial,1,40,2040,1,99,99,99,45.9059,465.369,57.1,,,,,,,,Tesla T4,2026-10-29T02:55:20
+flow_s3_fp16,libero_spatial,1,44,2044,1,106,106,106,49.3342,462.773,61.06,,,,,,,,Tesla T4,2026-10-29T02:56:21
+flow_s3_fp16,libero_spatial,1,48,2048,1,107,107,107,47.8956,449.826,59.29,,,,,,,,Tesla T4,2026-10-29T02:57:20
+flow_s3_fp16,libero_spatial,2,22,3022,1,107,107,107,48.1921,449.809,63.57,,,,,,,,Tesla T4,2026-10-29T02:58:24

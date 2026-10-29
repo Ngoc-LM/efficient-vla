@@ -1,0 +1,17 @@
+[02:38:20] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '20-49', 'method': 'flow', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': 3, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'fp16', 'event_trigger': False, 'graph': False, 'hold': 5, 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:1', 'seed_base': 1000, 'shard': '1/4', 'skip_from': '/kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv', 'out': '/kaggle/working/results/raw/spatial_cold3_fp16_x_s1.csv', 'max_hours': 6.0, 'save_actions': True, 'videos': 2} | shard episodes=75 done=0
+[02:39:52] policy cfg: n_action_steps=1 chunk=50 num_steps=3 dtypes={'float16': 604179104, 'float32': 755072} gpu=Tesla T4
+[02:41:22] t0 i21 success=1 steps=75 calls=75 vision=75 policy=37.9s wall=84.9s | 1/75 SR=1.000 ETA=1.84h
+[02:42:03] t0 i25 success=1 steps=68 calls=68 vision=68 policy=32.3s wall=41.0s | 2/75 SR=1.000 ETA=1.33h
+[02:42:50] t0 i29 success=1 steps=78 calls=78 vision=78 policy=37.4s wall=47.1s | 3/75 SR=1.000 ETA=1.19h
+[02:43:35] t0 i33 success=1 steps=73 calls=73 vision=73 policy=35.6s wall=44.6s | 4/75 SR=1.000 ETA=1.10h
+[02:44:18] t0 i37 success=1 steps=73 calls=73 vision=73 policy=34.6s wall=43.5s | 5/75 SR=1.000 ETA=1.03h
+[02:45:03] t0 i41 success=1 steps=74 calls=74 vision=74 policy=35.3s wall=44.2s | 6/75 SR=1.000 ETA=0.99h
+[02:45:48] t0 i45 success=1 steps=77 calls=77 vision=77 policy=36.5s wall=45.7s | 7/75 SR=1.000 ETA=0.96h
+[02:46:34] t0 i49 success=1 steps=76 calls=76 vision=76 policy=36.7s wall=45.9s | 8/75 SR=1.000 ETA=0.93h
+[02:47:42] t1 i23 success=1 steps=108 calls=108 vision=108 policy=51.9s wall=67.6s | 9/75 SR=1.000 ETA=0.96h
+[02:48:40] t1 i27 success=1 steps=97 calls=97 vision=97 policy=46.8s wall=57.5s | 10/75 SR=1.000 ETA=0.95h
+[02:51:19] t1 i31 success=0 steps=280 calls=280 vision=280 policy=132.1s wall=158.1s | 11/75 SR=0.909 ETA=1.11h
+[02:52:22] t1 i35 success=1 steps=102 calls=102 vision=102 policy=51.2s wall=63.5s | 12/75 SR=0.917 ETA=1.09h
+[02:55:09] t1 i39 success=0 steps=280 calls=280 vision=280 policy=138.2s wall=165.6s | 13/75 SR=0.846 ETA=1.21h
+[02:56:09] t1 i43 success=1 steps=99 calls=99 vision=99 policy=48.3s wall=59.7s | 14/75 SR=0.857 ETA=1.18h
+[02:57:16] t1 i47 success=1 steps=117 calls=117 vision=117 policy=55.1s wall=67.9s | 15/75 SR=0.867 ETA=1.16h

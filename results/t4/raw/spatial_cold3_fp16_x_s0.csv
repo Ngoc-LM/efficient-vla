@@ -1,0 +1,18 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+flow_s3_fp16,libero_spatial,0,20,1020,1,72,72,72,35.1514,458.697,82.07,,,,,,,,Tesla T4,2026-10-29T02:41:18
+flow_s3_fp16,libero_spatial,0,24,1024,0,280,280,280,128.2758,457.597,154.28,,,,,,,,Tesla T4,2026-10-29T02:43:54
+flow_s3_fp16,libero_spatial,0,28,1028,1,69,69,69,31.3025,452.507,40.36,,,,,,,,Tesla T4,2026-10-29T02:44:35
+flow_s3_fp16,libero_spatial,0,32,1032,0,280,280,280,128.0045,456.226,153.77,,,,,,,,Tesla T4,2026-10-29T02:47:09
+flow_s3_fp16,libero_spatial,0,36,1036,1,75,75,75,34.4905,459.299,43.9,,,,,,,,Tesla T4,2026-10-29T02:47:54
+flow_s3_fp16,libero_spatial,0,40,1040,1,76,76,76,34.8592,453.93,44.16,,,,,,,,Tesla T4,2026-10-29T02:48:38
+flow_s3_fp16,libero_spatial,0,44,1044,1,75,75,75,33.3177,442.711,42.01,,,,,,,,Tesla T4,2026-10-29T02:49:20
+flow_s3_fp16,libero_spatial,0,48,1048,1,72,72,72,31.7174,441.119,39.99,,,,,,,,Tesla T4,2026-10-29T02:50:00
+flow_s3_fp16,libero_spatial,1,22,2022,1,102,102,102,46.6956,456.544,61.41,,,,,,,,Tesla T4,2026-10-29T02:51:02
+flow_s3_fp16,libero_spatial,1,26,2026,1,100,100,100,48.2658,481.12,59.8,,,,,,,,Tesla T4,2026-10-29T02:52:02
+flow_s3_fp16,libero_spatial,1,30,2030,1,98,98,98,46.6219,473.159,57.85,,,,,,,,Tesla T4,2026-10-29T02:53:00
+flow_s3_fp16,libero_spatial,1,34,2034,1,93,93,93,44.0873,475.851,54.79,,,,,,,,Tesla T4,2026-10-29T02:53:54
+flow_s3_fp16,libero_spatial,1,38,2038,1,100,100,100,46.6939,468.379,57.79,,,,,,,,Tesla T4,2026-10-29T02:54:52
+flow_s3_fp16,libero_spatial,1,42,2042,1,104,104,104,48.3046,461.983,59.94,,,,,,,,Tesla T4,2026-10-29T02:55:52
+flow_s3_fp16,libero_spatial,1,46,2046,1,99,99,99,45.197,454.945,56.12,,,,,,,,Tesla T4,2026-10-29T02:56:48
+flow_s3_fp16,libero_spatial,2,20,3020,1,107,107,107,47.7679,446.523,62.97,,,,,,,,Tesla T4,2026-10-29T02:57:52
+flow_s3_fp16,libero_spatial,2,24,3024,1,83,83,83,37.5077,450.786,46.88,,,,,,,,Tesla T4,2026-10-29T02:58:39
