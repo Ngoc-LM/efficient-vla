@@ -1,0 +1,6 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+baseline,libero_spatial,0,21,1021,1,71,71,71,96.9269,1359.473,114.1,,,,,,,,Tesla T4,2026-10-29T04:42:30
+baseline,libero_spatial,0,25,1025,0,280,280,280,382.5674,1357.468,406.22,,,,,,,,Tesla T4,2026-10-29T04:49:17
+baseline,libero_spatial,0,29,1029,1,80,80,80,109.4221,1363.752,118.43,,,,,,,,Tesla T4,2026-10-29T04:51:16
+baseline,libero_spatial,0,33,1033,0,280,280,280,388.8455,1384.977,413.1,,,,,,,,Tesla T4,2026-10-29T04:58:09
+baseline,libero_spatial,0,37,1037,1,73,73,73,101.464,1369.618,110.17,,,,,,,,Tesla T4,2026-10-29T05:00:00

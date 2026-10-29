@@ -1,0 +1,7 @@
+[04:39:59] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '20-49', 'method': 'baseline', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': None, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'native', 'event_trigger': False, 'graph': False, 'hold': 5, 'fixed_noise': False, 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:1', 'seed_base': 1000, 'shard': '1/4', 'skip_from': '/kaggle/working/results/raw/spatial_baseline_x_s*.csv', 'out': '/kaggle/working/results/raw/spatial_baseline_x_s1.csv', 'max_hours': 6.0, 'save_actions': True, 'videos': 2} | shard episodes=75 done=0
+[04:40:35] policy cfg: n_action_steps=1 chunk=50 num_steps=10 dtypes={'bfloat16': 600902304, 'float32': 4031872} gpu=Tesla T4
+[04:42:30] t0 i21 success=1 steps=71 calls=71 vision=71 policy=96.9s wall=114.1s | 1/75 SR=1.000 ETA=2.37h
+[04:49:17] t0 i25 success=0 steps=280 calls=280 vision=280 policy=382.6s wall=406.2s | 2/75 SR=0.500 ETA=5.30h
+[04:51:16] t0 i29 success=1 steps=80 calls=80 vision=80 policy=109.4s wall=118.4s | 3/75 SR=0.667 ETA=4.28h
+[04:58:10] t0 i33 success=0 steps=280 calls=280 vision=280 policy=388.8s wall=413.1s | 4/75 SR=0.500 ETA=5.20h
+[05:00:00] t0 i37 success=1 steps=73 calls=73 vision=73 policy=101.5s wall=110.2s | 5/75 SR=0.600 ETA=4.53h
