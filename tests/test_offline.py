@@ -57,6 +57,13 @@ def test_fixed_noise_is_constant_within_episode_and_matches_step_zero():
     assert not torch.equal(fx((1, 50, 32), "cpu"), n0)
 
 
+def test_holm_adjustment():
+    from evla import stats
+
+    adj = stats.holm([0.01, 0.04, 0.03, 0.5])
+    assert adj == pytest.approx([0.04, 0.09, 0.09, 0.5])
+
+
 def test_refresh_rule():
     f = methods.should_refresh
     assert f(False, 0, 5, False, None, None)  # no cache yet

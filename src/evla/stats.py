@@ -126,6 +126,19 @@ def compare(rows_a, rows_b, margin: float = 0.05) -> dict:
     }
 
 
+
+def holm(pvals: list[float]) -> list[float]:
+    """Holm-Bonferroni adjusted p-values (step-down, monotone, capped at 1), in the input order."""
+    m = len(pvals)
+    order = sorted(range(m), key=lambda i: pvals[i])
+    adj = [0.0] * m
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (m - rank) * pvals[i]))
+        adj[i] = running
+    return adj
+
+
 def main(argv=None) -> int:
     from evla.common import read_rows
 

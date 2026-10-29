@@ -1,7 +1,7 @@
 """Summary table of all evaluated configurations against a reference run (paired on (task, init)).
 
 Per configuration: episodes, success rate (Wilson 95% CI), paired difference to the reference with
-Newcombe 95% CI and task-cluster bootstrap CI, exact McNemar p, non-inferiority at the margin,
+Newcombe 95% CI and task-cluster bootstrap CI, exact McNemar p, Holm-adjusted p over all comparisons with the reference, non-inferiority at the margin,
 policy calls per episode, policy GPU-seconds per episode and per control step, and gripper chatter
 (short gripper segments of <= 3 steps per 100 control steps) from the executed actions.
 
@@ -95,15 +95,21 @@ def main(argv=None) -> int:
                 "n_pairs", "sr_a", "sr_b", "a_only", "b_only", "diff_b_minus_a",
                 "ci95_newcombe", "ci95_task_bootstrap", "mcnemar_p", "noninferior")}
         table[m] = s
+    # Holm-Bonferroni over the family of all comparisons against the reference in this table
+    fam = [m for m in table if "paired_vs_ref" in table[m]]
+    for m, q in zip(fam, stats.holm([table[m]["paired_vs_ref"]["mcnemar_p"] for m in fam])):
+        table[m]["paired_vs_ref"]["mcnemar_p_holm"] = q
+        table[m]["paired_vs_ref"]["holm_family_size"] = len(fam)
     ref_ms = table.get(args.ref, {}).get("policy_ms_per_step")
-    hdr = f"{'method':34s} {'n':>4s} {'SR':>6s} {'dSR vs ref [95% CI]':>24s} {'p':>6s} {'calls/100st':>11s} {'ms/step':>8s} {'speedup':>7s} {'chatter':>7s}"
+    hdr = f"{'method':34s} {'n':>4s} {'SR':>6s} {'dSR vs ref [95% CI]':>24s} {'p':>6s} {'p_holm':>6s} {'calls/100st':>11s} {'ms/step':>8s} {'speedup':>7s} {'chatter':>7s}"
     print(hdr)
     for m, s in table.items():
         p = s.get("paired_vs_ref")
         d = f"{p['diff_b_minus_a']:+.3f} [{p['ci95_newcombe'][0]:+.3f},{p['ci95_newcombe'][1]:+.3f}]" if p else "-"
         pv = f"{p['mcnemar_p']:.3f}" if p else "-"
+        ph = f"{p['mcnemar_p_holm']:.3f}" if p else "-"
         sp = f"{ref_ms / s['policy_ms_per_step']:.1f}x" if ref_ms else "-"
-        print(f"{m:34s} {s['n']:4d} {s['sr']:6.3f} {d:>24s} {pv:>6s} {s['calls_per_100_steps']:11.1f} "
+        print(f"{m:34s} {s['n']:4d} {s['sr']:6.3f} {d:>24s} {pv:>6s} {ph:>6s} {s['calls_per_100_steps']:11.1f} "
               f"{s['policy_ms_per_step']:8.0f} {sp:>7s} {s.get('chatter_per_100', float('nan')):7.2f}")
     if args.out:
         with open(args.out, "w") as f:
