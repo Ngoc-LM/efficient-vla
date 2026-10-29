@@ -27,3 +27,7 @@
 [06:10:54] t3 i28 success=1 steps=80 calls=80 vision=80 policy=109.5s wall=118.3s | 25/75 SR=0.720 ETA=3.01h
 [06:17:38] t3 i32 success=0 steps=280 calls=280 vision=280 policy=380.5s wall=404.7s | 26/75 SR=0.692 ETA=3.05h
 [06:19:37] t3 i36 success=1 steps=82 calls=82 vision=82 policy=110.1s wall=119.1s | 27/75 SR=0.704 ETA=2.93h
+[06:21:39] t3 i40 success=1 steps=82 calls=82 vision=82 policy=113.1s wall=121.8s | 28/75 SR=0.714 ETA=2.83h
+[06:28:21] t3 i44 success=0 steps=280 calls=280 vision=280 policy=378.0s wall=401.8s | 29/75 SR=0.690 ETA=2.85h
+[06:30:23] t3 i48 success=1 steps=84 calls=84 vision=84 policy=113.0s wall=122.1s | 30/75 SR=0.700 ETA=2.75h
+[06:37:14] t4 i22 success=0 steps=280 calls=280 vision=280 policy=380.9s wall=409.9s | 31/75 SR=0.677 ETA=2.76h
