@@ -1,0 +1,2 @@
+[00:33:49] run: python -u -m evla.bench_graph --modes native,fp16 --steps 10,3,2,1 --out /kaggle/working/results/profile/graph_t4.json > /kaggle/working/results/profile/graph_t4.log 2>&1
+[00:42:28] done: exit 0

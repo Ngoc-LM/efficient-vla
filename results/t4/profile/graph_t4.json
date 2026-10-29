@@ -1,0 +1,175 @@
+{
+ "gpu": "Tesla T4",
+ "results": {
+  "native": {
+   "prefix_ms": {
+    "p50": 286.76927185058594,
+    "p90": 292.89992065429686,
+    "n": 60
+   },
+   "per_steps": {
+    "10": {
+     "eager_ms": {
+      "p50": 789.2438049316406,
+      "p90": 811.2019775390625,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 571.9586486816406,
+      "p90": 574.0612426757813,
+      "n": 60
+     },
+     "speedup_p50": 1.379896617965023,
+     "capture_s": 2.2202324840000074,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "3": {
+     "eager_ms": {
+      "p50": 432.7364959716797,
+      "p90": 442.62530822753905,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 371.8983612060547,
+      "p90": 376.8624206542969,
+      "n": 60
+     },
+     "speedup_p50": 1.16358806897758,
+     "capture_s": 0.7892906030000404,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "2": {
+     "eager_ms": {
+      "p50": 386.2065124511719,
+      "p90": 392.16196594238284,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 345.421630859375,
+      "p90": 348.377197265625,
+      "n": 60
+     },
+     "speedup_p50": 1.118072749208925,
+     "capture_s": 0.6140518259999794,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "1": {
+     "eager_ms": {
+      "p50": 335.4478759765625,
+      "p90": 338.4589508056641,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 318.08241271972656,
+      "p90": 321.3166229248047,
+      "n": 60
+     },
+     "speedup_p50": 1.0545942264092962,
+     "capture_s": 0.42832004500002085,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    }
+   }
+  },
+  "fp16": {
+   "prefix_ms": {
+    "p50": 82.5375862121582,
+    "p90": 85.25929336547851,
+    "n": 60
+   },
+   "per_steps": {
+    "10": {
+     "eager_ms": {
+      "p50": 616.0660400390625,
+      "p90": 636.3490844726563,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 177.96812438964844,
+      "p90": 183.93117065429686,
+      "n": 60
+     },
+     "speedup_p50": 3.4616650714946577,
+     "capture_s": 1.854021467999928,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "3": {
+     "eager_ms": {
+      "p50": 245.20764923095703,
+      "p90": 249.46932373046874,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 111.85681533813477,
+      "p90": 118.85233383178712,
+      "n": 60
+     },
+     "speedup_p50": 2.1921565394984,
+     "capture_s": 0.5727428039999722,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "2": {
+     "eager_ms": {
+      "p50": 190.7045440673828,
+      "p90": 194.3098403930664,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 103.21894454956055,
+      "p90": 109.89686126708985,
+      "n": 60
+     },
+     "speedup_p50": 1.8475730874753915,
+     "capture_s": 0.40965038599995296,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    },
+    "1": {
+     "eager_ms": {
+      "p50": 135.62802124023438,
+      "p90": 137.24222717285156,
+      "n": 60
+     },
+     "graph_ms": {
+      "p50": 93.26561737060547,
+      "p90": 95.57456436157227,
+      "n": 60
+     },
+     "speedup_p50": 1.454212442526331,
+     "capture_s": 0.2505884540000807,
+     "eager_patched_vs_released_max": 0.0,
+     "graph_vs_released_max": 0.0,
+     "graph_vs_released_mean": 0.0,
+     "graph_replay_repeatable_max": 0.0,
+     "finite": true
+    }
+   }
+  }
+ }
+}
