@@ -1,0 +1,2 @@
+# D2: same flow noise for every re-plan of an episode (paired against flow_s3_fp16, inits 0-19).
+spatial_fp16_s3_fixnoise --method flow --flow-steps 3 --dtype fp16 --fixed-noise

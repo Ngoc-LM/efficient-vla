@@ -70,6 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--event-trigger", action="store_true", help="re-plan at predicted gripper switches")
     ap.add_argument("--graph", action="store_true", help="replay the flow integration from a CUDA graph")
     ap.add_argument("--hold", type=int, default=5, help="event trigger: steps without a new trigger")
+    ap.add_argument("--fixed-noise", action="store_true", help="same flow noise for every re-plan of an episode")
     ap.add_argument("--policy", default="HuggingFaceVLA/smolvla_libero")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--seed-base", type=int, default=1000)
@@ -121,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
         f"num_steps={policy.config.num_steps} dtypes={loading.param_dtypes(policy)} gpu={loading.gpu_name()}", logf)
 
     stats = methods.CallStats()
-    crn = methods.CRNNoise()
+    crn = methods.CRNNoise(fixed=args.fixed_noise)
     sampler = None
     if args.method in ("stale", "warm", "stale_warm"):
         sampler = methods.install_sampler(
@@ -270,6 +271,8 @@ def method_name(args) -> str:
         name += f"_s{args.flow_steps}"
     if args.dtype != "native":
         name += f"_{args.dtype}"
+    if args.fixed_noise:
+        name += "_fixnoise"
     if args.graph:
         name += "_graph"
     return name

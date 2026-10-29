@@ -1,0 +1,5 @@
+# D3: in-loop latency with one process per GPU (SHARDS=2, OUT_DIR=results/latency, inits 0-1)
+# and an in-loop equivalence check of CUDA-graph replay (actions compared per episode).
+lat_fp16_s3         --method flow --flow-steps 3 --dtype fp16
+lat_fp16_s3_graph   --method flow --flow-steps 3 --dtype fp16 --graph
+lat_baseline        --method baseline

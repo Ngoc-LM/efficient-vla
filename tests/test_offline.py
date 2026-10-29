@@ -46,6 +46,17 @@ def test_crn_noise_depends_only_on_episode_and_step():
     assert len({methods.crn_seed(k, s) for k in range(20) for s in range(600)}) == 20 * 600
 
 
+def test_fixed_noise_is_constant_within_episode_and_matches_step_zero():
+    ref, fx = methods.CRNNoise(), methods.CRNNoise(fixed=True)
+    ref.set_episode(common.episode_key(2, 5))
+    fx.set_episode(common.episode_key(2, 5))
+    n0 = ref((1, 50, 32), "cpu")
+    fx.step = 40
+    assert torch.equal(fx((1, 50, 32), "cpu"), n0)
+    fx.set_episode(common.episode_key(2, 6))
+    assert not torch.equal(fx((1, 50, 32), "cpu"), n0)
+
+
 def test_refresh_rule():
     f = methods.should_refresh
     assert f(False, 0, 5, False, None, None)  # no cache yet

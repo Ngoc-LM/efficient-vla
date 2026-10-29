@@ -30,11 +30,16 @@ import torch.nn.functional as F  # noqa: N812
 
 
 class CRNNoise:
-    """Replaces `model.sample_noise`; noise depends only on (episode_key, control_step)."""
+    """Replaces `model.sample_noise`; noise depends only on (episode_key, control_step).
 
-    def __init__(self) -> None:
+    With `fixed=True` every re-plan of an episode starts from the same noise (that of step 0), so
+    the chunk becomes a deterministic function of the observation within the episode.
+    """
+
+    def __init__(self, fixed: bool = False) -> None:
         self.episode_key = 0
         self.step = 0
+        self.fixed = bool(fixed)
 
     def set_episode(self, key: int) -> None:
         self.episode_key = int(key)
@@ -42,7 +47,7 @@ class CRNNoise:
 
     def __call__(self, shape, device):
         g = torch.Generator(device="cpu")
-        g.manual_seed(crn_seed(self.episode_key, self.step))
+        g.manual_seed(crn_seed(self.episode_key, 0 if self.fixed else self.step))
         return torch.randn(shape, generator=g, dtype=torch.float32).to(device)
 
 
