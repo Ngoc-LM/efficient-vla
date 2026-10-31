@@ -1,0 +1,18 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+flow_s2_fp16,libero_spatial,0,0,1000,1,76,76,76,29.6349,372.04,49.16,,,,,,,,Tesla T4,2026-10-31T00:35:28
+flow_s2_fp16,libero_spatial,0,4,1004,1,69,69,69,25.1195,361.062,33.96,,,,,,,,Tesla T4,2026-10-31T00:36:03
+flow_s2_fp16,libero_spatial,0,8,1008,1,76,76,76,27.9811,367.839,37.7,,,,,,,,Tesla T4,2026-10-31T00:36:41
+flow_s2_fp16,libero_spatial,0,12,1012,1,73,73,73,27.2678,369.049,36.41,,,,,,,,Tesla T4,2026-10-31T00:37:18
+flow_s2_fp16,libero_spatial,0,16,1016,1,69,69,69,25.5552,369.086,33.84,,,,,,,,Tesla T4,2026-10-31T00:37:52
+flow_s2_fp16,libero_spatial,1,0,2000,1,101,101,101,36.4344,360.587,51.19,,,,,,,,Tesla T4,2026-10-31T00:38:43
+flow_s2_fp16,libero_spatial,1,4,2004,0,280,280,280,100.7869,359.043,125.3,,,,,,,,Tesla T4,2026-10-31T00:40:49
+flow_s2_fp16,libero_spatial,1,8,2008,0,280,280,280,100.4207,359.584,126.67,,,,,,,,Tesla T4,2026-10-31T00:42:56
+flow_s2_fp16,libero_spatial,1,12,2012,1,96,96,96,35.3007,367.196,46.1,,,,,,,,Tesla T4,2026-10-31T00:43:43
+flow_s2_fp16,libero_spatial,1,16,2016,0,280,280,280,100.3919,357.088,126.0,,,,,,,,Tesla T4,2026-10-31T00:45:49
+flow_s2_fp16,libero_spatial,2,0,3000,0,280,280,280,99.4169,353.32,129.04,,,,,,,,Tesla T4,2026-10-31T00:47:59
+flow_s2_fp16,libero_spatial,2,4,3004,1,102,102,102,36.9267,358.179,47.95,,,,,,,,Tesla T4,2026-10-31T00:48:47
+flow_s2_fp16,libero_spatial,2,8,3008,0,280,280,280,101.8075,365.733,128.49,,,,,,,,Tesla T4,2026-10-31T00:50:55
+flow_s2_fp16,libero_spatial,2,12,3012,1,101,101,101,37.1122,367.653,48.17,,,,,,,,Tesla T4,2026-10-31T00:51:43
+flow_s2_fp16,libero_spatial,2,16,3016,1,90,90,90,33.1374,368.982,43.66,,,,,,,,Tesla T4,2026-10-31T00:52:27
+flow_s2_fp16,libero_spatial,3,0,4000,1,82,82,82,30.9631,380.402,44.88,,,,,,,,Tesla T4,2026-10-31T00:53:12
+flow_s2_fp16,libero_spatial,3,4,4004,1,74,74,74,27.7224,367.817,37.06,,,,,,,,Tesla T4,2026-10-31T00:53:50

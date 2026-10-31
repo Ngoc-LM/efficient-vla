@@ -1,0 +1,25 @@
+[00:33:59] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '0-19', 'method': 'flow', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': 2, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'fp16', 'event_trigger': False, 'graph': False, 'hold': 5, 'fixed_noise': False, 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:1', 'seed_base': 1000, 'shard': '3/4', 'skip_from': '/kaggle/working/results/raw/spatial_fp16_s2_s*.csv', 'out': '/kaggle/working/results/raw/spatial_fp16_s2_s3.csv', 'max_hours': 6.0, 'save_actions': True, 'videos': 2} | shard episodes=50 done=0
+[00:34:38] policy cfg: n_action_steps=1 chunk=50 num_steps=2 dtypes={'float16': 604179104, 'float32': 755072} gpu=Tesla T4
+[00:35:29] t0 i3 success=1 steps=75 calls=75 vision=75 policy=29.8s wall=49.3s | 1/50 SR=1.000 ETA=0.69h
+[00:36:04] t0 i7 success=1 steps=69 calls=69 vision=69 policy=25.7s wall=34.5s | 2/50 SR=1.000 ETA=0.57h
+[00:36:41] t0 i11 success=1 steps=72 calls=72 vision=72 policy=27.5s wall=36.8s | 3/50 SR=1.000 ETA=0.53h
+[00:37:17] t0 i15 success=1 steps=69 calls=69 vision=69 policy=26.7s wall=35.5s | 4/50 SR=1.000 ETA=0.51h
+[00:37:51] t0 i19 success=1 steps=70 calls=70 vision=70 policy=26.3s wall=34.7s | 5/50 SR=1.000 ETA=0.48h
+[00:38:43] t1 i3 success=1 steps=100 calls=100 vision=100 policy=36.6s wall=51.5s | 6/50 SR=1.000 ETA=0.50h
+[00:39:33] t1 i7 success=1 steps=104 calls=104 vision=104 policy=38.1s wall=49.3s | 7/50 SR=1.000 ETA=0.50h
+[00:40:21] t1 i11 success=1 steps=101 calls=101 vision=101 policy=37.4s wall=48.4s | 8/50 SR=1.000 ETA=0.50h
+[00:41:05] t1 i15 success=1 steps=92 calls=92 vision=92 policy=34.0s wall=44.1s | 9/50 SR=1.000 ETA=0.49h
+[00:41:52] t1 i19 success=1 steps=98 calls=98 vision=98 policy=36.3s wall=46.9s | 10/50 SR=1.000 ETA=0.48h
+[00:42:40] t2 i3 success=1 steps=90 calls=90 vision=90 policy=33.2s wall=47.2s | 11/50 SR=1.000 ETA=0.47h
+[00:43:28] t2 i7 success=1 steps=100 calls=100 vision=100 policy=36.8s wall=47.9s | 12/50 SR=1.000 ETA=0.47h
+[00:44:12] t2 i11 success=1 steps=92 calls=92 vision=92 policy=33.5s wall=43.8s | 13/50 SR=1.000 ETA=0.45h
+[00:45:00] t2 i15 success=1 steps=102 calls=102 vision=102 policy=37.0s wall=48.2s | 14/50 SR=1.000 ETA=0.44h
+[00:47:12] t2 i19 success=0 steps=280 calls=280 vision=280 policy=104.6s wall=131.3s | 15/50 SR=0.933 ETA=0.49h
+[00:47:56] t3 i3 success=1 steps=83 calls=83 vision=83 policy=29.7s wall=43.3s | 16/50 SR=0.938 ETA=0.47h
+[00:48:36] t3 i7 success=1 steps=83 calls=83 vision=83 policy=30.2s wall=39.8s | 17/50 SR=0.941 ETA=0.45h
+[00:49:19] t3 i11 success=1 steps=88 calls=88 vision=88 policy=32.8s wall=43.2s | 18/50 SR=0.944 ETA=0.43h
+[00:49:58] t3 i15 success=1 steps=77 calls=77 vision=77 policy=29.5s wall=39.0s | 19/50 SR=0.947 ETA=0.42h
+[00:50:39] t3 i19 success=1 steps=83 calls=83 vision=83 policy=31.1s wall=41.2s | 20/50 SR=0.950 ETA=0.40h
+[00:51:52] t4 i3 success=1 steps=141 calls=141 vision=141 policy=53.3s wall=72.6s | 21/50 SR=0.952 ETA=0.40h
+[00:52:55] t4 i7 success=1 steps=124 calls=124 vision=124 policy=47.9s wall=62.2s | 22/50 SR=0.955 ETA=0.39h
+[00:54:04] t4 i11 success=1 steps=140 calls=140 vision=140 policy=53.2s wall=68.9s | 23/50 SR=0.957 ETA=0.38h
