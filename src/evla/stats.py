@@ -6,7 +6,7 @@
 - Non-inferiority decision against a pre-registered margin.
 
 Usage:
-  python -m evla.stats --a results/raw/spatial_baseline.csv --b results/raw/spatial_stale_k5.csv
+  python -m evla.stats --a results/t4/raw/spatial_baseline_s0.csv --b results/t4/raw/spatial_ol5_s0.csv
 """
 
 from __future__ import annotations

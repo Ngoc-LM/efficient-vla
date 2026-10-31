@@ -15,3 +15,9 @@ paper/*.blg
 
 # slide deck contains personal contact details; kept out of the public repository
 deliverables/*.pptx
+
+# LaTeX build artefacts
+paper/*.brf
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz

@@ -1,11 +1,13 @@
 """Build deliverables/literature_matrix.xlsx from the verified paper records and this study's results.
 
 Inputs:  deliverables/data/litmatrix.jsonl (one verified record per paper),
-         results/t4/summary.json (paired success rates), results/t4/profile/graph_t4.json (latency).
+         results/t4/report_numbers.json (paired success rates, as in the report),
+         results/t4/profile/graph_t4.json (latency).
 Usage:   python scripts/build_literature_matrix.py   (then recalculate formulas, e.g. LibreOffice)
 """
 
 import json
+import re
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -47,6 +49,22 @@ BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 ALT = PatternFill("solid", fgColor="F2F6FA")
 
 
+DISPLAY = {"pi0": "π0", "DiffusionPolicy": "Diffusion Policy", "RealtimeVLA": "Realtime-VLA",
+           "Islam-ONNX": "Islam (ONNX)"}
+
+
+def pretty(v):
+    """ASCII notation from the reading notes -> readable symbols (cell text only)."""
+    if not isinstance(v, str):
+        return v
+    v = v.replace("->", "→").replace("+-", "±")
+    for a, b in ((r"\beps_theta\b", "ε_θ"), (r"\bv_theta\b", "v_θ"), (r"\beps_k\b", "ε_k"), (r"\beps\b", "ε"),
+                 (r"\btau\b", "τ"), (r"\btheta\b", "θ"), (r"A\^tau", "A^τ"), (r"\bpi0\.5\b", "π0.5"),
+                 (r"\bpi0\b", "π0"), (r"\bdelta\b", "δ")):
+        v = re.sub(a, b, v)
+    return v
+
+
 def header(ws, row, headers):
     for j, h in enumerate(headers, 1):
         c = ws.cell(row=row, column=j, value=h)
@@ -58,7 +76,7 @@ def table(ws, headers, rows, widths, start_row=1):
     header(ws, start_row, headers)
     for i, r in enumerate(rows, start_row + 1):
         for j, v in enumerate(r, 1):
-            c = ws.cell(row=i, column=j, value=v)
+            c = ws.cell(row=i, column=j, value=pretty(v))
             c.font = BOLD if j == 1 else BODY
             c.alignment, c.border = WRAP, BORDER
             if (i - start_row) % 2 == 0:
@@ -89,20 +107,24 @@ RELEVANCE = {
 def sheet_matrix(wb, papers):
     ws = wb.active
     ws.title = "Matrix"
-    headers = ["ID", "Paper", "First author", "Year", "Venue / arXiv", "Relevance to this study",
-               "Model size & backbone", "Action generation",
-               "Efficiency lever (what is reduced and how)", "Main target", "Reported efficiency gain (hardware)",
-               "Benchmark & success rate", "Assumptions", "Trade-offs", "Open questions", "Training-free",
-               "Source (read)"]
+    headers = ["Paper", "Title", "Relevance to this study", "Efficiency lever (what is reduced and how)",
+               "Reported efficiency gain (hardware)", "Benchmark & success rate", "Training-free",
+               "Main target", "Action generation", "Model size & backbone", "Assumptions", "Trade-offs",
+               "Open questions", "First author", "Year", "Venue (arXiv)", "Source (read)"]
     rows = []
     for p in papers:
-        venue = p["venue"] if p["venue"] and p["venue"] != "arXiv" else "arXiv"
-        rows.append([p["id"], p["title"], p["first_author"], p["year"], f'{venue} ({p["arxiv_id"]})',
-                     RELEVANCE[p["id"]], p["params_and_backbone"], p["action_generation"], p["efficiency_lever"],
-                     TARGETS.get(p["id"], ""), p["reported_gain"], p["benchmark_success"], p["assumptions"],
-                     p["tradeoffs"], p["open_questions"], p["training_free"], p["url"]])
-    table(ws, headers, rows, [13, 30, 16, 6, 22, 40, 34, 34, 44, 22, 44, 44, 36, 36, 40, 9, 30])
+        venue = p["venue"] if p["venue"] else "arXiv"
+        tf = "yes" if p["training_free"].lower().startswith("yes") else "no"
+        rows.append([DISPLAY.get(p["id"], p["id"]), p["title"], RELEVANCE[p["id"]], p["efficiency_lever"],
+                     p["reported_gain"], p["benchmark_success"], tf, TARGETS.get(p["id"], ""),
+                     p["action_generation"], p["params_and_backbone"], p["assumptions"], p["tradeoffs"],
+                     p["open_questions"], p["first_author"], p["year"], f'{venue} ({p["arxiv_id"]})', p["url"]])
+    table(ws, headers, rows, [14, 30, 40, 44, 44, 44, 10, 22, 34, 34, 36, 36, 40, 16, 6, 24, 30])
     ws.row_dimensions[1].height = 30
+    ws.freeze_panes = "C2"
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}{len(rows) + 1}"
+    for c in ws["G"][1:]:
+        c.alignment = Alignment(horizontal="center", vertical="top")
 
 
 def sheet_diffusion_flow(wb):
@@ -188,39 +210,40 @@ def sheet_this_study(wb):
         "Blue numbers are measured inputs (60 calls per configuration after warm-up, interleaved rounds); "
         "speed-ups are formulas against the released configuration.")).font = Font(name=F, size=9, italic=True)
 
-    s = json.load(open(ROOT / "results/t4/summary.json"))
-    order = [("baseline", "Released (bf16, 10 steps, re-plan every step)"), ("flow_s3", "bf16, 3 steps"),
-             ("flow_s3_fp16", "fp16, 3 steps"),
-             ("stale_k5_s3", "Stale image (refresh every 5 steps), 3 steps"),
-             ("open_loop_k5", "Open loop, 5 actions per re-plan"),
-             ("open_loop_k5_evt_h5", "Open loop 5 + gripper-event re-plan"),
-             ("open_loop_k10", "Open loop, 10 actions per re-plan"),
-             ("flow_s2_fp16", "fp16, 2 steps"),
-             ("flow_s1_fp16", "fp16, 1 step"),
-             ("flow_s3_fp16_fixnoise", "fp16, 3 steps, one fixed noise per episode (probe)")]
-    order = [o for o in order if o[0] in s] + [(k, k) for k in s if k not in dict(order)]
+    rn = json.load(open(ROOT / "results/t4/report_numbers.json"))
+    t, pre = rn["table_states_0_19"], rn["pre_specified"]
+    rows = [("Open loop, 5 actions per re-plan", "0-19", t["open_loop_k5"], True),
+            ("Open loop, 10 actions per re-plan", "0-19", t["open_loop_k10"], True),
+            ("Open loop 5 + gripper-event re-plan", "0-19", t["open_loop_k5_events"], True),
+            ("Stale image (cached up to 5 steps), 3 steps", "0-19", t["stale_image"], True),
+            ("bf16, 3 steps", "0-19", t["bf16_s3"], True),
+            ("fp16, 3 steps", "0-19", t["fp16_s3"], True),
+            ("fp16, 2 steps", "0-19", t["fp16_s2"], True),
+            ("fp16, 1 step", "0-19", t["fp16_s1"], True),
+            ("fp16, 3 steps, one fixed noise per episode (probe)", "0-19", t["fp16_s3_fixed_noise"], True),
+            ("fp16, 3 steps (states 20-49 added after the interim look)", "20-49", pre["fp16_s3_states_20_49"], False),
+            ("fp16, 3 steps, all 500 pairs", "0-49", pre["fp16_s3_states_0_49"], False),
+            ("fp16, 1 step (confirmation fixed before the run)", "20-49", pre["fp16_s1_states_20_49"], False)]
     r0 = note + 2
-    header(ws, r0, ["Configuration (paired, same episodes, common random numbers)", "n", "Success rate",
-                    "Delta vs released (pp)", "95% CI low (pp)", "95% CI high (pp)", "McNemar p",
-                    "Policy calls per 100 steps"])
-    for i, (k, lab) in enumerate(order, r0 + 1):
-        v = s[k]
-        p = v.get("paired_vs_ref")
-        vals = [lab, v["n"], v["sr"], (p["diff_b_minus_a"] * 100 if p else 0.0),
-                (p["ci95_newcombe"][0] * 100 if p else None), (p["ci95_newcombe"][1] * 100 if p else None),
-                (p["mcnemar_p"] if p else None), v["calls_per_100_steps"]]
-        fmts = [None, "0", "0.0%", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "0.000", "0.0"]
+    head = ["Configuration (paired with the released policy)", "Initial states", "Pairs", "Released SR (same pairs)",
+            "Variant SR", "Difference (points)", "95% CI low (points)", "95% CI high (points)", "McNemar p",
+            "Holm p (Table 4 family)"]
+    header(ws, r0, head)
+    fmts = [None, None, "0", "0.0%", "0.0%", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "0.000", "0.000"]
+    for i, (lab, states, c, in_table) in enumerate(rows, r0 + 1):
+        vals = [lab, states, c["n_pairs"], c["sr_a"], c["sr_b"], c["diff_b_minus_a"] * 100,
+                c["ci95_newcombe"][0] * 100, c["ci95_newcombe"][1] * 100, c["mcnemar_p"],
+                c.get("mcnemar_p_holm") if in_table else None]
         for j, (x, fm) in enumerate(zip(vals, fmts), 1):
-            c = ws.cell(row=i, column=j, value=x)
-            c.font, c.border = (BOLD if j == 1 else BODY), BORDER
+            cell = ws.cell(row=i, column=j, value=x)
+            cell.font, cell.border = (BOLD if j == 1 else BODY), BORDER
             if fm:
-                c.number_format = fm
-    ws.cell(row=r0 + len(order) + 2, column=1, value=(
-        "Source: results/t4/summary.json (Newcombe paired CI; exact McNemar, unadjusted). "
-        "Non-inferiority margin: -5 pp. fp16 1 step pools the exploratory states 0-19 with the confirmation "
-        "states 20-49; the pre-specified test on states 20-49 alone gives +6.0 pp [+0.6, +11.4], p = 0.04 "
-        "(results/t4/report_numbers.json).")).font = Font(name=F, size=9, italic=True)
-    for j, w in enumerate([46, 8, 12, 14, 14, 14, 12, 16], 1):
+                cell.number_format = fm
+    ws.cell(row=r0 + len(rows) + 2, column=1, value=(
+        "Source: results/t4/report_numbers.json (scripts/report_numbers.py): Newcombe paired 95% CI, exact McNemar; "
+        "Holm over the nine comparisons on states 0-19 (report Table 4); the tests on states 20-49 are unadjusted. "
+        "Non-inferiority margin: -5 points, fixed before any run.")).font = Font(name=F, size=9, italic=True)
+    for j, w in enumerate([50, 10, 7, 13, 11, 12, 12, 12, 11, 12], 1):
         ws.column_dimensions[get_column_letter(j)].width = w
 
 
@@ -228,8 +251,10 @@ def sheet_notes(wb):
     ws = wb.create_sheet("Notes")
     notes = [
         "How this matrix was built: every entry was read from the paper's own arXiv abstract, HTML or PDF "
-        "(column 'Source'). 'UNVERIFIED' marks values not found in the text that was read; '(reviewer inference)' "
-        "marks open questions that are the reviewer's reading, not the authors' statement.",
+        "(column 'Source (read)'). 'Not reported' marks values not found in the text that was read; "
+        "'(interpretation)' marks open questions that are this study's reading, not the authors' statement.",
+        "Venues and years follow the publication (e.g. NeurIPS 2025); the report's bibliography keeps the BibTeX "
+        "exported from Google Scholar, which dates NeurIPS 2025 proceedings (volume 38) as 2026.",
         "Inconsistencies found in the sources: Diffusion Policy states 10 DDIM inference steps (Sec. 3.4) and 16 "
         "(App. A.4); VLA-Cache's 1.7x headline is larger than its per-model tables (OpenVLA 1.63x).",
         "Scope: the matrix keeps the ten papers that are most cited and most directly tied to this study (column "
@@ -244,7 +269,7 @@ def sheet_notes(wb):
         "equivalence for every efficiency change.",
         "Coda (2026) and Realtime-VLA (2025) already apply fewer flow steps and CUDA graphs, respectively; this "
         "study does not claim these levers as new.",
-        "Venues for pi0 and OpenVLA-OFT are not stated on the arXiv pages read and are left as arXiv.",
+
     ]
     ws.column_dimensions["A"].width = 140
     for i, t in enumerate(notes, 1):
@@ -261,6 +286,10 @@ def main():
     sheet_diffusion_flow(wb)
     sheet_this_study(wb)
     sheet_notes(wb)
+    for ws in wb.worksheets:
+        ws.page_setup.orientation = "landscape"
+        ws.page_setup.fitToWidth, ws.page_setup.fitToHeight = 1, 0
+        ws.sheet_properties.pageSetUpPr.fitToPage = True
     wb.save(OUT)
     print(OUT, len(papers), "papers")
 

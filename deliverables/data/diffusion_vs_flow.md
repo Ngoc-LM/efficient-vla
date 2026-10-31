@@ -1,6 +1,6 @@
-# Diffusion vs flow matching in VLA action heads — verified fact sheet
+# Diffusion vs flow matching in VLA action heads — fact sheet (source notes for the literature matrix)
 
-All values read from the papers' arXiv PDF/HTML (URLs per section). "UNVERIFIED" = not found in the text read.
+All values read from the papers' arXiv PDF/HTML (URLs per section). "Not reported" = not found in the text read.
 
 ## Diffusion Policy (Chi et al.; RSS 2023 conference version; arXiv 2303.04137, extended version read)
 Source: https://arxiv.org/pdf/2303.04137
@@ -30,7 +30,7 @@ Source: https://arxiv.org/html/2410.24164 , https://arxiv.org/pdf/2410.24164
 
 ## SmolVLA (Shukor et al., arXiv 2506.01844 v1)
 Source: https://arxiv.org/html/2506.01844 , https://arxiv.org/pdf/2506.01844
-- Action expert: conditional flow-matching transformer with interleaved cross-attention and causal self-attention, attending to VLM features from layer N = L/2 of SmolVLM-2. Expert hidden size is 0.75 × d (VLM hidden size); the expert's parameter count is UNVERIFIED. Total model 0.45B.
+- Action expert: conditional flow-matching transformer with interleaved cross-attention and causal self-attention, attending to VLM features from layer N = L/2 of SmolVLM-2. Expert hidden size is 0.75 × d (VLM hidden size); the expert's parameter count is not reported. Total model 0.45B.
 - Flow steps: "During inference, the flow matching is fixed to 10 steps."
 - Chunk: n = 50 by default. In the chunk-size ablation, n = 10 gives a higher LIBERO avg (84.0 vs 80.3 for n = 50).
 - Async inference: a RobotClient streams observations to a PolicyServer, and an action-queue threshold g triggers the next chunk request before the queue empties. On SO-100: completion time 13.75 s → 9.70 s (~30% faster), 19 vs 9 cubes in a fixed-time episode, success 78.3% (sync) vs 73.3% (async).

@@ -5,12 +5,16 @@
 
 1. Table of closed-loop results: every variant against the released policy on initial states 0-19
    (200 pairs), Holm adjustment over the comparisons in the table.
-2. Pre-specified tests on more pairs: fp16 S=3 on initial states 0-49 (500 pairs, primary
-   non-inferiority test) and fp16 S=1 on the fresh initial states 20-49 only (300 pairs,
-   confirmation of the S-curve result, not pooled with the exploratory states 0-19).
+2. Tests on more pairs: fp16 S=3 on initial states 0-49 (500 pairs; states 20-49 were added after the
+   200-pair lower bound missed the margin, so they are also reported alone) and fp16 S=1 on the fresh
+   initial states 20-49 only (300 pairs, a confirmation fixed before the run, not pooled with the
+   exploratory states 0-19).
 3. Fixed noise against fresh noise (both fp16, S=3), states 0-19.
 4. In-loop latency with one process per GPU, and whether CUDA-graph replay changes trajectories
    compared with the run-to-run variation of eager execution.
+5. Failure modes of the released policy (states 0-19) from the executed gripper commands: segments of
+   at most 3 steps are merged into their neighbour (chatter), then failures are classed as closing the
+   gripper three or more times, else still closed at the step limit, else reopened after 1-2 closures.
 """
 
 from __future__ import annotations
@@ -57,6 +61,54 @@ def actions(run_glob):
     return out
 
 
+def gripper_segments(actions, short=3):
+    """[(sign, length)] of the gripper command (+1 closed), segments of <= `short` steps merged."""
+    segs: list[list[int]] = []
+    for v in np.where(actions[:, -1] > 0, 1, -1):
+        if segs and segs[-1][0] == v:
+            segs[-1][1] += 1
+        else:
+            segs.append([int(v), 1])
+    while len(segs) > 1:
+        idx = [i for i, (_, n) in enumerate(segs) if n <= short]
+        if not idx:
+            break
+        i = idx[0]
+        segs[i - 1 if i > 0 else 1][1] += segs[i][1]
+        del segs[i]
+        merged: list[list[int]] = []
+        for v, n in segs:
+            if merged and merged[-1][0] == v:
+                merged[-1][1] += n
+            else:
+                merged.append([v, n])
+        segs = merged
+    return [tuple(x) for x in segs]
+
+
+def failure_modes(raw_dir, run="spatial_baseline", inits=range(20)):
+    import csv
+
+    counts = {"closes_3_or_more": 0, "closed_at_limit": 0, "reopened_after_1_2_closures": 0, "no_closure": 0}
+    for path in sorted(glob.glob(os.path.join(raw_dir, f"{run}_s[0-9].csv"))):
+        with open(path, newline="") as f:
+            for r in csv.DictReader(f):
+                if int(r["init_id"]) not in inits or r["success"] == "1":
+                    continue
+                a = np.load(os.path.join(path[:-4] + "_actions", f"t{r['task_id']}_i{r['init_id']}.npy"))
+                segs = gripper_segments(a)
+                closes = sum(1 for v, _ in segs if v > 0)
+                if closes == 0:
+                    counts["no_closure"] += 1
+                elif closes >= 3:
+                    counts["closes_3_or_more"] += 1
+                elif segs[-1][0] > 0:
+                    counts["closed_at_limit"] += 1
+                else:
+                    counts["reopened_after_1_2_closures"] += 1
+    return counts
+
+
 def same_trajectory(a, b):
     return len(a) == len(b) and bool(np.array_equal(a, b))
 
@@ -91,6 +143,8 @@ def main() -> int:
 
     s_all, s_new = set(range(50)), set(range(20, 50))
     out["pre_specified"]["fp16_s3_states_0_49"] = cmp(subset(runs[REF], s_all), subset(runs["flow_s3_fp16"], s_all))
+    # states 20-49 were added after the 200-pair lower bound (-5.8) missed the margin: report them alone too
+    out["pre_specified"]["fp16_s3_states_20_49"] = cmp(subset(runs[REF], s_new), subset(runs["flow_s3_fp16"], s_new))
     if "flow_s1_fp16" in runs:
         new = subset(runs["flow_s1_fp16"], s_new)
         if new:
@@ -118,6 +172,8 @@ def main() -> int:
                         "identical_first_action": sum(bool(np.array_equal(eager[k][0], other[k][0])) for k in keys)}
         out["latency_in_loop"]["trajectory_equality"] = eq
 
+    out["failure_modes_released_states_0_19"] = failure_modes(args.raw)
+
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w") as f:
         json.dump(out, f, indent=1)
@@ -137,6 +193,7 @@ def main() -> int:
         print(f"fixed vs fresh noise: {c['sr_a']:.3f}->{c['sr_b']:.3f} discordant {c['a_only']}/{c['b_only']} "
               f"p={c['mcnemar_p']:.2g}")
     print(json.dumps(out["latency_in_loop"], indent=1))
+    print("failure modes (released, states 0-19):", out["failure_modes_released_states_0_19"])
     return 0
 
 

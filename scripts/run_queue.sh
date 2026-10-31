@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run a list of evaluation configurations one after another on a Kaggle session and push the
 # results to GitHub after each one. Start it detached:
-#   bash scripts/bg.sh /kaggle/working/results/queue.log bash scripts/run_queue.sh scripts/queue_spatial.txt
+#   bash scripts/bg.sh /kaggle/working/results/queue.log bash scripts/run_queue.sh scripts/queues/queue_spatial_v6.txt
 # Each line of the queue file: <run_name> <run_eval args...>   (lines starting with # are skipped)
 # Re-running the same queue resumes: finished episodes are skipped by run_eval.
 set -uo pipefail

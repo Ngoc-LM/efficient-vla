@@ -62,10 +62,11 @@ Open loop $k{=}10$ & 15 & 15 & 12 & 9 & 12 & 15 & 17 & 11 & 14 & 15 \\
 \end{table}
 
 \paragraph{Failure categories.}
-Failures of the released policy are categorised from the executed gripper commands, since object poses are not logged: a grasp is a switch from open to closed.
-\emph{Released off target}: the episode ends with the gripper open after one or two grasps (28 of 46).
-\emph{Holding at timeout}: the gripper is closed at the step limit (9).
-\emph{Repeated grasps}: three or more grasps (9).
+Failures of the released policy are categorised from the executed gripper commands, since object poses are not logged: segments of at most 3 steps are first merged into their neighbour (chatter), and a closure is a switch from open to closed (\texttt{scripts/report\_numbers.py}).
+\emph{Three or more closures}: 9 of 46.
+\emph{Closed at the step limit} (one or two closures): 9.
+\emph{Reopened after one or two closures}: 28.
+Every failure closes the gripper at least once.
 
 \paragraph{Warm-started flow (rejected before closed-loop tests).}
 Starting the integration from the previous chunk, shifted by one step and re-noised to flow time $t_0$, was calibrated offline on 586 control steps of five LIBERO-Object episodes.

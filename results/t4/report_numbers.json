@@ -253,6 +253,27 @@
    "noninferiority_margin": 0.05,
    "noninferior": true
   },
+  "fp16_s3_states_20_49": {
+   "n_pairs": 300,
+   "sr_a": 0.7433333333333333,
+   "sr_b": 0.7933333333333333,
+   "both": 205,
+   "a_only": 18,
+   "b_only": 33,
+   "neither": 44,
+   "diff_b_minus_a": 0.050000000000000044,
+   "ci95_newcombe": [
+    0.003114386704458398,
+    0.09704758708967591
+   ],
+   "ci95_task_bootstrap": [
+    0.006666666666666667,
+    0.1
+   ],
+   "mcnemar_p": 0.04887389231827033,
+   "noninferiority_margin": 0.05,
+   "noninferior": true
+  },
   "fp16_s1_states_20_49": {
    "n_pairs": 300,
    "sr_a": 0.7433333333333333,
@@ -348,5 +369,11 @@
   "mcnemar_p": 3.4507445333269973e-28,
   "noninferiority_margin": 0.05,
   "noninferior": false
+ },
+ "failure_modes_released_states_0_19": {
+  "closes_3_or_more": 9,
+  "closed_at_limit": 9,
+  "reopened_after_1_2_closures": 28,
+  "no_closure": 0
  }
 }
