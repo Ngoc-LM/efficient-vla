@@ -8,3 +8,12 @@
 [02:34:20] t1 i2 success=0 steps=280 calls=280 vision=280 policy=128.1s wall=156.2s | 6/50 SR=0.167 ETA=1.74h
 [02:36:53] t1 i6 success=0 steps=280 calls=280 vision=280 policy=129.1s wall=153.5s | 7/50 SR=0.143 ETA=1.72h
 [02:39:26] t1 i10 success=0 steps=280 calls=280 vision=280 policy=127.4s wall=153.3s | 8/50 SR=0.125 ETA=1.70h
+[02:42:00] t1 i14 success=0 steps=280 calls=280 vision=280 policy=128.4s wall=153.9s | 9/50 SR=0.111 ETA=1.67h
+[02:44:32] t1 i18 success=0 steps=280 calls=280 vision=280 policy=127.3s wall=151.5s | 10/50 SR=0.100 ETA=1.63h
+[02:45:31] t2 i2 success=1 steps=97 calls=97 vision=97 policy=44.0s wall=58.2s | 11/50 SR=0.182 ETA=1.50h
+[02:46:33] t2 i6 success=1 steps=109 calls=109 vision=109 policy=49.9s wall=61.8s | 12/50 SR=0.250 ETA=1.40h
+[02:49:13] t2 i10 success=0 steps=280 calls=280 vision=280 policy=133.8s wall=160.1s | 13/50 SR=0.231 ETA=1.38h
+[02:50:08] t2 i14 success=1 steps=92 calls=92 vision=92 policy=44.3s wall=54.8s | 14/50 SR=0.286 ETA=1.29h
+[02:52:49] t2 i18 success=0 steps=280 calls=280 vision=280 policy=133.7s wall=160.6s | 15/50 SR=0.267 ETA=1.27h
+[02:55:34] t3 i2 success=0 steps=280 calls=280 vision=280 policy=133.2s wall=164.4s | 16/50 SR=0.250 ETA=1.26h
+[02:58:14] t3 i6 success=0 steps=280 calls=280 vision=280 policy=133.6s wall=160.7s | 17/50 SR=0.235 ETA=1.24h
