@@ -77,3 +77,4 @@
 [04:37:02] t9 i41 success=1 steps=127 calls=127 vision=127 policy=33.0s wall=40.9s | 25/27 SR=0.560 ETA=0.05h
 [04:37:43] t9 i45 success=1 steps=130 calls=130 vision=130 policy=33.3s wall=41.2s | 26/27 SR=0.577 ETA=0.03h
 [04:39:10] t9 i49 success=0 steps=280 calls=280 vision=280 policy=71.6s wall=87.3s | 27/27 SR=0.556 ETA=0.00h
+[00:13:53] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '20-49', 'method': 'flow', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': 3, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'fp16', 'event_trigger': False, 'graph': False, 'hold': 5, 'fixed_noise': False, 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:1', 'seed_base': 1000, 'shard': '3/4', 'skip_from': '/kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv', 'out': '/kaggle/working/results/raw/spatial_cold3_fp16_x_s3.csv', 'max_hours': 6.0, 'save_actions': True, 'videos': 2} | shard episodes=75 done=75

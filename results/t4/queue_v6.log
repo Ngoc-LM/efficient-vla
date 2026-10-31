@@ -1,27 +1,7 @@
 cp: warning: behavior of -n is non-portable and may change in future; use --update=none instead
-[03:55:10] start spatial_cold3_fp16_x: --method flow --flow-steps 3 --dtype fp16 --inits 20-49
-592 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s0.csv
-594 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s1.csv
-597 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s2.csv
-600 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s3.csv
-pushed 1879 files -> results/t4 @ ababd8f
-pushed 1940 files -> results/t4 @ 2381118
-[04:39:53] done  spatial_cold3_fp16_x: 300 episodes
-pushed 1948 files -> results/t4 @ 86a5159
-[04:39:56] start spatial_baseline_x: --method baseline --inits 20-49
-2256 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s0.csv
-2258 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s1.csv
-2260 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s2.csv
-2262 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method baseline --inits 20-49 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_baseline_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_baseline_x_s3.csv
-pushed 1988 files -> results/t4 @ e66125a
-pushed 2015 files -> results/t4 @ 78be432
-pushed 2042 files -> results/t4 @ c95bbf4
-pushed 2067 files -> results/t4 @ 0e5f189
-pushed 2088 files -> results/t4 @ 31e441f
-pushed 2104 files -> results/t4 @ 8659bc9
-pushed 2125 files -> results/t4 @ 2169c6e
-pushed 2150 files -> results/t4 @ f6790c4
-pushed 2176 files -> results/t4 @ 9d8db9f
-pushed 2196 files -> results/t4 @ aa52c08
-pushed 2216 files -> results/t4 @ 3edd80a
-pushed 2241 files -> results/t4 @ 482420a
+[00:13:45] start spatial_cold3_fp16_x: --method flow --flow-steps 3 --dtype fp16 --inits 20-49
+572 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s0.csv
+574 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s1.csv
+577 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s2.csv
+580 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --inits 20-49 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_cold3_fp16_x_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_cold3_fp16_x_s3.csv
+[00:14:16] done  spatial_cold3_fp16_x: 300 episodes
