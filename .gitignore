@@ -12,3 +12,6 @@ paper/*.out
 paper/*.bbl
 paper/*.blg
 .DS_Store
+
+# slide deck contains personal contact details; kept out of the public repository
+deliverables/*.pptx
