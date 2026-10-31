@@ -1,0 +1,11 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+flow_s3_fp16,libero_spatial,0,0,1000,1,76,76,76,21.2159,268.814,33.64,,,,,,,,Tesla T4,2026-10-31T04:19:22
+flow_s3_fp16,libero_spatial,1,0,2000,1,101,101,101,27.8707,273.196,37.8,,,,,,,,Tesla T4,2026-10-31T04:20:00
+flow_s3_fp16,libero_spatial,2,0,3000,0,280,280,280,77.5842,274.295,97.43,,,,,,,,Tesla T4,2026-10-31T04:21:38
+flow_s3_fp16,libero_spatial,3,0,4000,1,85,85,85,23.5414,273.119,32.92,,,,,,,,Tesla T4,2026-10-31T04:22:11
+flow_s3_fp16,libero_spatial,4,0,5000,1,151,151,151,42.0681,274.931,55.52,,,,,,,,Tesla T4,2026-10-31T04:23:07
+flow_s3_fp16,libero_spatial,5,0,6000,1,86,86,86,23.6248,272.502,33.19,,,,,,,,Tesla T4,2026-10-31T04:23:41
+flow_s3_fp16,libero_spatial,6,0,7000,1,120,120,120,31.5678,258.289,42.34,,,,,,,,Tesla T4,2026-10-31T04:24:24
+flow_s3_fp16,libero_spatial,7,0,8000,0,280,280,280,73.7456,260.604,96.03,,,,,,,,Tesla T4,2026-10-31T04:26:00
+flow_s3_fp16,libero_spatial,8,0,9000,1,93,93,93,23.9721,254.531,33.11,,,,,,,,Tesla T4,2026-10-31T04:26:34
+flow_s3_fp16,libero_spatial,9,0,10000,1,131,131,131,34.5051,258.16,46.54,,,,,,,,Tesla T4,2026-10-31T04:27:21

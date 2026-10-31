@@ -1,0 +1,30 @@
+{
+ "args": {
+  "suite": "libero_spatial",
+  "tasks": "0-9",
+  "inits": "0-1",
+  "method": "flow",
+  "k": 5,
+  "warm_t0": 0.5,
+  "warm_steps": 3,
+  "flow_steps": 3,
+  "img_tau": null,
+  "no_gripper_refresh": false,
+  "dtype": "fp16",
+  "event_trigger": false,
+  "graph": false,
+  "hold": 5,
+  "fixed_noise": false,
+  "policy": "HuggingFaceVLA/smolvla_libero",
+  "device": "cuda:0",
+  "seed_base": 1000,
+  "shard": "0/2",
+  "skip_from": "/kaggle/working/results/latency/lat_fp16_s3_s*.csv",
+  "out": "/kaggle/working/results/latency/lat_fp16_s3_s0.csv",
+  "max_hours": 6.0,
+  "save_actions": true,
+  "videos": 0
+ },
+ "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+ "torch": "2.11.0+cu128"
+}
