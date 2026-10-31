@@ -1,0 +1,8 @@
+method,suite,task_id,init_id,seed,success,n_steps,n_chunk_calls,n_vision_calls,policy_s,policy_ms_p50,wall_s,refresh_init,refresh_period,refresh_image,refresh_gripper,n_warm,n_cold,n_events,gpu,finished_at
+flow_s3_fp16_fixnoise,libero_spatial,0,1,1001,0,280,280,280,142.1528,504.859,177.83,,,,,,,,Tesla T4,2026-10-31T02:23:03
+flow_s3_fp16_fixnoise,libero_spatial,0,5,1005,0,280,280,280,142.046,505.911,168.2,,,,,,,,Tesla T4,2026-10-31T02:25:52
+flow_s3_fp16_fixnoise,libero_spatial,0,9,1009,0,280,280,280,140.4557,502.273,166.82,,,,,,,,Tesla T4,2026-10-31T02:28:40
+flow_s3_fp16_fixnoise,libero_spatial,0,13,1013,0,280,280,280,137.9707,493.287,165.26,,,,,,,,Tesla T4,2026-10-31T02:31:25
+flow_s3_fp16_fixnoise,libero_spatial,0,17,1017,0,280,280,280,136.1613,482.327,161.36,,,,,,,,Tesla T4,2026-10-31T02:34:07
+flow_s3_fp16_fixnoise,libero_spatial,1,1,2001,0,280,280,280,136.2657,483.978,166.4,,,,,,,,Tesla T4,2026-10-31T02:36:54
+flow_s3_fp16_fixnoise,libero_spatial,1,5,2005,1,89,89,89,43.0622,482.659,52.98,,,,,,,,Tesla T4,2026-10-31T02:37:47
