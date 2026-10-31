@@ -47,3 +47,6 @@
 [02:12:07] t8 i19 success=0 steps=280 calls=280 vision=280 policy=77.1s wall=103.7s | 45/50 SR=0.822 ETA=0.07h
 [02:13:14] t9 i3 success=1 steps=161 calls=161 vision=161 policy=44.1s wall=65.9s | 46/50 SR=0.826 ETA=0.06h
 [02:14:05] t9 i7 success=1 steps=138 calls=138 vision=138 policy=36.8s wall=51.6s | 47/50 SR=0.830 ETA=0.04h
+[02:14:49] t9 i11 success=1 steps=121 calls=121 vision=121 policy=31.3s wall=44.1s | 48/50 SR=0.833 ETA=0.03h
+[02:15:22] t9 i15 success=1 steps=130 calls=130 vision=130 policy=23.0s wall=32.3s | 49/50 SR=0.837 ETA=0.01h
+[02:16:08] t9 i19 success=1 steps=125 calls=125 vision=125 policy=33.6s wall=46.4s | 50/50 SR=0.840 ETA=0.00h
