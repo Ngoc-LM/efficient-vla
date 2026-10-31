@@ -304,10 +304,10 @@
    "max": 904.96
   },
   "flow_s3_fp16_graph": {
-   "episodes": 10,
-   "replan_ms_median_of_episode_p50": 113.8275,
-   "min": 112.761,
-   "max": 116.533
+   "episodes": 20,
+   "replan_ms_median_of_episode_p50": 113.968,
+   "min": 111.016,
+   "max": 117.996
   },
   "flow_s3_fp16": {
    "episodes": 20,
@@ -317,9 +317,9 @@
   },
   "trajectory_equality": {
    "graph_vs_eager": {
-    "episodes": 10,
-    "identical_trajectories": 5,
-    "identical_first_action": 10
+    "episodes": 20,
+    "identical_trajectories": 10,
+    "identical_first_action": 20
    },
    "eager_vs_eager_other_run": {
     "episodes": 20,

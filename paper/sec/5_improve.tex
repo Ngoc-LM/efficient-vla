@@ -68,7 +68,7 @@ By the fits, an Euler step costs 51--53\,ms eagerly in either precision (launch-
 On 200 pairs the lower bound for float16 $S{=}3$ ($-5.8$) misses the margin; on the planned 500 pairs (initial states 0--49) it succeeds in 78.4\% against 75.4\% ($+3.0$ points, 95\% CI $[-0.6, +6.6]$; task-cluster bootstrap $[-1.2, +8.4]$): non-inferior, with a non-significant gain ($p{=}0.13$).
 Fewer steps do not lower SR measurably either ($S{=}2$: 77.5\%, $S{=}1$: 79.5\%), and on 300 fresh pairs (initial states 20--49, a test fixed in advance) $S{=}1$ succeeds in 80.3\% against 74.3\% ($+6.0$ points, 95\% CI $[+0.6, +11.4]$, $p{=}0.04$; task bootstrap $[-1.0, +12.7]$) at 93\,ms per re-plan ($8.5\times$): non-inferior, and better on this test but not robustly across tasks.
 In the loop, a float16 $S{=}3$ re-plan takes 275\,ms eagerly and 114\,ms with the graph, close to the isolated values.
-Replay keeps the first action of every episode; whole trajectories match the eager ones in 5 of 10 episodes, as two eager runs do in 10 of 20: execution is not bit-reproducible, and the loop amplifies small differences.
+Replay keeps the first action of every episode; whole trajectories match the eager ones in 10 of 20 episodes, exactly as often as two eager runs (10 of 20): execution is not bit-reproducible, and the loop amplifies small differences.
 
 \paragraph{Consistent noise is not the remedy.}
 Fixed noise removes the chatter (0.5 against 3.8 short gripper segments per 100 steps) but lowers SR from 77.0\% to 23.5\% (111 against 4 discordant pairs, $p<10^{-27}$), while $S{=}1$ removes it too (0.7) without lowering SR: chatter accompanies failures without causing them.
