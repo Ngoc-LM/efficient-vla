@@ -60,3 +60,5 @@ pushed 3012 files -> results/t4 @ 55637a4
 5821 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-1 --save-actions --method baseline --shard 1/2 --device cuda:1 --skip-from /kaggle/working/results/latency/lat_baseline_s*.csv --max-hours 6 --out /kaggle/working/results/latency/lat_baseline_s1.csv
 pushed 3032 files -> results/t4 @ 7e1f7fa
 [05:06:02] done  lat_baseline: 20 episodes
+pushed 3038 files -> results/t4 @ d123843
+[05:06:05] queue finished
