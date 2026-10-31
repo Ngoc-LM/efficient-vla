@@ -2,7 +2,7 @@
 \label{sec:conclusion}
 
 For the released SmolVLA checkpoint on a T4, the cost of a re-plan is set less by FLOPs than by emulated bfloat16 and a launch-bound flow loop.
-Sharing computation across steps lowers success by about 12 points, whereas removing these overheads and the discretisation slack makes a re-plan $7.0\times$ cheaper without a measurable loss on 200 paired episodes.
-\pending{Update with the 500-pair decision and the $S$-curve.}
+Sharing computation across steps lowers success by about 12 points, whereas removing these overheads and the discretisation slack makes a re-plan $7.0\times$ cheaper while remaining non-inferior on 500 paired episodes (95\% CI of the difference $[-0.6, +6.6]$ points).
+\pending{Update with the $S$-curve.}
 \textbf{Limitations:} one checkpoint, one LIBERO suite, one GPU type and simulation only; the baseline (77.0\%) is below the 90\% of the paper configuration.
 \textbf{Future work:} the remaining 84\,ms lie in the vision-language prefix, which calls for distillation into a smaller backbone, and embedded GPUs or exported runtimes should be evaluated with the same paired closed-loop test~\cite{islam2026faster}.

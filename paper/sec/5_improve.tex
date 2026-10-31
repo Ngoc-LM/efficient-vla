@@ -67,8 +67,9 @@ Along released $\to$ float16 $\to$ $S{=}3$ $\to$ graph, a re-plan takes 789, 616
 The fits explain these factors.
 Without the graph, an Euler step costs 50.5\,ms in bfloat16 and 53.3\,ms in float16, independent of the arithmetic: the loop is launch-bound.
 With the graph, it costs 28.3 and 9.4\,ms: removing launches exposes the emulated arithmetic, so the graph gains $1.38\times$ in bfloat16 but $3.46\times$ in float16 at $S{=}10$.
-On 200 pairs, neither $S{=}3$ variant differs significantly from the released 77.0\%, but for float16 the lower bound ($-5.8$) does not yet clear the margin.
-\pending{500 pairs: non-inferiority. $S$-curve. Fixed noise vs fp16 $S{=}3$ (SR, chatter). In-loop latency and graph equivalence.}
+On 200 pairs, neither $S{=}3$ variant differs significantly from the released 77.0\%, but for float16 the lower bound ($-5.8$) does not clear the margin.
+On the planned 500 pairs (initial states 0--49), float16 with $S{=}3$ succeeds in 78.4\% against 75.4\% ($+3.0$ points, 95\% CI $[-0.6, +6.6]$; task-cluster bootstrap $[-1.2, +8.4]$): it is non-inferior, and the gain is not significant ($p{=}0.13$).
+\pending{$S$-curve. Fixed noise vs fp16 $S{=}3$ (SR, chatter). In-loop latency and graph equivalence.}
 
 \paragraph{Trade-offs and next bottleneck.}
 The float16 gain is specific to GPUs without bfloat16 tensor cores; elsewhere only the step and graph gains would apply (not measured).
