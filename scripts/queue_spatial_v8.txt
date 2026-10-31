@@ -1,0 +1,3 @@
+# Confirmation of the one-step result on fresh initial states (inits 20-49, paired with spatial_baseline_x).
+# Pre-specified test: fp16 S=1 vs released, exact McNemar on these 300 pairs only (not pooled with inits 0-19).
+spatial_fp16_s1_x      --method flow --flow-steps 1 --dtype fp16 --inits 20-49
