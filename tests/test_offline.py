@@ -315,3 +315,16 @@ def test_static_prefix_cache_matches_dynamic_append_and_crop():
     dyn2 = _Dyn([(torch.randn(1, 2, 7, 4), torch.randn(1, 2, 7, 4)) for _ in range(3)])
     st.load(dyn2)
     assert st.layers[0].keys.data_ptr() == ptr and torch.equal(st.layers[0].keys, dyn2.layers[0].keys)
+
+
+def test_noise_spread_stats():
+    import numpy as np
+
+    from evla.noise_spread import first_action_stats
+
+    acts = np.array([[1.0, 0.0, 1.0], [1.0, 0.0, 1.0], [1.0, 0.0, -1.0], [1.0, 0.0, 1.0]])
+    out = first_action_stats(acts, ref_mean=np.array([1.0, 0.0, 0.5]))
+    assert abs(out["grip_split"] - 0.25) < 1e-9
+    assert out["spread"] > 0 and abs(out["to_mean10"]) < 1e-9
+    same = first_action_stats(np.ones((5, 3)), None)
+    assert same["spread"] == 0 and same["grip_split"] == 0 and "to_mean10" not in same
