@@ -69,3 +69,9 @@
 [06:03:53] t8 i46 success=1 steps=105 calls=105 vision=105 policy=26.8s wall=38.1s | 67/75 SR=0.806 ETA=0.11h
 [06:04:45] t9 i20 success=1 steps=136 calls=136 vision=136 policy=34.2s wall=51.9s | 68/75 SR=0.809 ETA=0.10h
 [06:06:21] t9 i24 success=1 steps=264 calls=264 vision=264 policy=68.4s wall=95.4s | 69/75 SR=0.812 ETA=0.09h
+[06:07:56] t9 i28 success=0 steps=280 calls=280 vision=280 policy=69.7s wall=95.3s | 70/75 SR=0.800 ETA=0.07h
+[06:08:37] t9 i32 success=1 steps=128 calls=128 vision=128 policy=28.5s wall=40.8s | 71/75 SR=0.803 ETA=0.06h
+[06:09:16] t9 i36 success=1 steps=131 calls=131 vision=131 policy=27.4s wall=38.6s | 72/75 SR=0.806 ETA=0.04h
+[06:09:49] t9 i40 success=1 steps=120 calls=120 vision=120 policy=24.2s wall=33.9s | 73/75 SR=0.808 ETA=0.03h
+[06:10:31] t9 i44 success=1 steps=123 calls=123 vision=123 policy=29.8s wall=41.9s | 74/75 SR=0.811 ETA=0.01h
+[06:11:08] t9 i48 success=1 steps=119 calls=119 vision=119 policy=25.8s wall=36.9s | 75/75 SR=0.813 ETA=0.00h
