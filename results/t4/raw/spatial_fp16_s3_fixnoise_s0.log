@@ -44,3 +44,9 @@
 [03:54:41] t8 i4 success=0 steps=280 calls=280 vision=280 policy=127.6s wall=153.2s | 42/50 SR=0.238 ETA=0.30h
 [03:57:12] t8 i8 success=0 steps=280 calls=280 vision=280 policy=127.5s wall=151.2s | 43/50 SR=0.233 ETA=0.26h
 [03:59:48] t8 i12 success=0 steps=280 calls=280 vision=280 policy=125.2s wall=155.1s | 44/50 SR=0.227 ETA=0.23h
+[04:02:18] t8 i16 success=0 steps=280 calls=280 vision=280 policy=126.4s wall=150.1s | 45/50 SR=0.222 ETA=0.19h
+[04:04:55] t9 i0 success=0 steps=280 calls=280 vision=280 policy=126.9s wall=156.4s | 46/50 SR=0.217 ETA=0.15h
+[04:07:31] t9 i4 success=0 steps=280 calls=280 vision=280 policy=129.7s wall=156.1s | 47/50 SR=0.213 ETA=0.11h
+[04:10:10] t9 i8 success=0 steps=280 calls=280 vision=280 policy=132.5s wall=159.6s | 48/50 SR=0.208 ETA=0.08h
+[04:12:32] t9 i12 success=0 steps=280 calls=280 vision=280 policy=116.7s wall=141.3s | 49/50 SR=0.204 ETA=0.04h
+[04:14:53] t9 i16 success=0 steps=280 calls=280 vision=280 policy=116.5s wall=140.9s | 50/50 SR=0.200 ETA=0.00h
