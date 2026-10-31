@@ -20,7 +20,8 @@ Released checkpoint on LIBERO-Spatial: **77.0%** success on 200 episodes (75.4% 
 | fp16, 1 step, CUDA graph (fresh states 20–49) | 93 | 300 | 80.3 | +6.0 [+0.6, +11.4] |
 | fp16, 3 steps, one fixed noise per episode | – | 200 | 23.5 | −53.5 [−60.3, −45.4] |
 
-Re-planning less often lowers success; re-planning more cheaply keeps it (non-inferior, margin
+Success rates come from eager runs; the CUDA graph replays the same computation (identical actions on
+isolated calls). Re-planning less often lowers success; re-planning more cheaply keeps it (non-inferior, margin
 −5 points). Holding the flow noise fixed removes gripper chatter but most successes too.
 Full table: `PYTHONPATH=src python scripts/report_numbers.py` (writes `results/t4/report_numbers.json`).
 
