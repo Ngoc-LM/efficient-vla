@@ -375,5 +375,16 @@
   "closed_at_limit": 9,
   "reopened_after_1_2_closures": 28,
   "no_closure": 0
+ },
+ "noise_spread_probe": {
+  "n_probes": 193,
+  "S1_spread": 0.17590329660961665,
+  "S1_grip_split": 0.0038860103626943004,
+  "S1_to_mean10": 0.45591314901342045,
+  "S3_spread": 0.7070415691699389,
+  "S3_grip_split": 0.01683937823834197,
+  "S3_to_mean10": 0.13195295682070787,
+  "S10_spread": 0.9976439778668893,
+  "S10_grip_split": 0.02072538860103627
  }
 }

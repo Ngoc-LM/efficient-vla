@@ -2,10 +2,9 @@
 \label{sec:analysis}
 
 \paragraph{Computational bottlenecks.}
-\cref{tab:profile} breaks down one re-plan (CUDA events, warm-up, median of 60 calls).
-The simulator is not the bottleneck (32\,ms per step against 814\,ms for the policy).
+\cref{tab:profile} breaks down one re-plan; the simulator is not the bottleneck (32\,ms per step against 814\,ms for the policy).
 The vision encoder takes 230\,ms in the released bfloat16 weights but 39\,ms in float16: Turing GPUs have no bfloat16 tensor cores and emulate it.
-The action expert accounts for 18\% of the FLOPs of a re-plan but 63\% of its latency ($10\times51$\,ms), and its step time is the same in both precisions: a pass over 50 action tokens is only 11.5\,GFLOP but launches several hundred kernels, so at batch one the GPU waits on launches rather than arithmetic.
+The action expert accounts for 18\% of the FLOPs of a re-plan but 63\% of its latency ($10\times51$\,ms), and its step time is the same in both precisions: a pass over 50 action tokens is only 11.5\,GFLOP, and replaying its kernels from a CUDA graph cuts it from 53 to 9.4\,ms (\cref{sec:improve}): at batch one the GPU waits on kernel launches rather than on arithmetic.
 
 \begin{table}[t]
 \centering\footnotesize
@@ -21,23 +20,23 @@ Re-plan, $S{=}10$ (released) & 642 & 814 & 605 \\
 Simulator step (CPU + EGL) & -- & \multicolumn{2}{c}{32} \\
 \bottomrule
 \end{tabular}
-\caption{Cost of one re-plan on a Tesla T4 (isolated components; \cref{tab:latency}, from a separate run, agrees within 3\%).}
+\caption{Cost of one re-plan on a Tesla T4 (isolated components, CUDA events, median of 60 calls; \cref{tab:latency}, from a separate run, agrees within 4\% for a full re-plan).}
 \label{tab:profile}
 \end{table}
 
 \paragraph{Successful and failed trajectories.}
-Successes finish in a median of 100 steps; all 46 failures run to the 280-step limit after at least one grasp.
-From the executed gripper commands (object poses are not logged), 28 failures release the bowl off target after one or two grasps, 9 still hold it at the limit, and 9 grasp three or more times; task~3 (bowl on the cookie box) fails in 10 of 20 episodes.
-Fresh flow noise at every re-plan makes consecutive chunks differ about as much as independent samples (first normalised action: 1.31 from the shifted previous chunk, 1.37 between two noises; 581 LIBERO-Object steps).
+Successes finish in a median of 100 steps; all 46 failures run to the 280-step limit after at least one gripper closure.
+From the executed gripper commands (object poses are not logged; segments of at most 3 steps merged), 9 failures close the gripper three or more times, 9 others keep it closed at the limit, and 28 reopen it after one or two closures; task~3 (bowl on the cookie box) fails in 10 of 20 episodes.
+Fresh flow noise at every re-plan makes consecutive chunks differ about as much as independent samples (first normalised action: 1.31 from the shifted previous chunk, 1.37 between two noises; 5 LIBERO-Object episodes).
 The gripper command chatters accordingly: failed episodes contain 12.6 gripper segments of at most 3 steps per 100 steps, successful ones 2.7.
 
 \paragraph{Strengths.}
-\textbf{S1 Small footprint:} 1.16\,GB of weights and 21\,MB of activations per re-plan (float16) fit a 16\,GB T4 with room for several processes.
+\textbf{S1 Small footprint:} 1.16\,GB of weights and 21\,MB of activations per re-plan (float16) fit a 16\,GB T4 several times.
 \textbf{S2 Prefix caching:} the expert reuses the cached prefix, so a flow step costs 52\,ms against 304\,ms for the prefix.
 \textbf{S3 Few-step flow:} with $S{=}3$ the first action deviates from $S{=}10$ by 0.32, a quarter of the sampling spread (1.37), and SR holds down to $S{=}1$ (\cref{sec:improve}).
 
 \paragraph{Limitations.}
 \textbf{L1 Precision mismatch:} bfloat16 weights run emulated on Turing.
 \textbf{L2 Launch-bound expert:} the flow loop dominates latency at batch one while using little arithmetic.
-\textbf{L3 Need for fresh images:} executing 5 actions per chunk, or re-planning with fresh proprioception but a 5-step-old image, loses 12.0--12.5 points (\cref{sec:improve}), so an episode needs a full re-plan at every step.
-\textbf{L4 A fresh sample at every step:} independent noise at every re-plan produces gripper chatter, concentrated in failures, although removing it does not raise SR (\cref{sec:improve}).
+\textbf{L3 Need for fresh images:} executing 5 actions per chunk, or re-planning with fresh proprioception but an image up to 4 steps old, loses 12.0--12.5 points (\cref{sec:improve}), so an episode needs a full re-plan at every step.
+\textbf{L4 A fresh sample at every step:} independent noise at every re-plan produces gripper chatter, concentrated in failures, although removing it alone does not raise SR measurably (\cref{sec:improve}).

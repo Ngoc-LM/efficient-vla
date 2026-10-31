@@ -21,3 +21,4 @@ paper/*.brf
 paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
+deliverables/*slides*.pdf

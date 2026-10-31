@@ -174,6 +174,13 @@ def main() -> int:
 
     out["failure_modes_released_states_0_19"] = failure_modes(args.raw)
 
+    # noise-spread probe (src/evla/noise_spread.py): pooled over the two GPU shards, weighted by probes
+    probe = [json.load(open(f)) for f in sorted(glob.glob(os.path.join(os.path.dirname(args.raw), "probe", "spread_*.json")))]
+    if probe:
+        n = sum(p["n_probes"] for p in probe)
+        keys = probe[0]["summary"].keys()
+        out["noise_spread_probe"] = {"n_probes": n, **{k: sum(p["summary"][k] * p["n_probes"] for p in probe) / n for k in keys}}
+
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w") as f:
         json.dump(out, f, indent=1)
@@ -194,6 +201,8 @@ def main() -> int:
               f"p={c['mcnemar_p']:.2g}")
     print(json.dumps(out["latency_in_loop"], indent=1))
     print("failure modes (released, states 0-19):", out["failure_modes_released_states_0_19"])
+    if "noise_spread_probe" in out:
+        print("noise-spread probe:", {k: round(v, 3) for k, v in out["noise_spread_probe"].items()})
     return 0
 
 

@@ -2,15 +2,14 @@
 \label{sec:improve}
 
 \paragraph{Bottleneck and hypotheses.}
-A successful episode (100 steps) spends about 79\,s in the policy and 3\,s in the simulator.
-\textbf{H1 (re-plan less):} computation can be shared across steps without lowering SR, by executing $k$ actions per chunk (open loop), by also re-planning when the next queued action switches the gripper, or by re-planning with fresh proprioception on image and language keys and values cached for 5 steps (stale image).
+\textbf{H1 (re-plan less):} computation can be shared across steps without lowering SR, by executing $k$ actions per chunk (open loop), by also re-planning when the next queued action switches the gripper, or by re-planning with fresh proprioception on image and language keys and values cached for up to 5 steps and refreshed after gripper switches (stale image).
 \textbf{H2 (re-plan more cheaply):} each re-plan can be made cheaper while computing the same function up to precision and discretisation: float16 removes the emulated arithmetic (same weights, projections kept in float32), $S{=}3$ removes discretisation slack (S3 in \cref{sec:analysis}), and a CUDA graph removes the launches of the expert loop, which should gain more once precision is fixed.
-For the graph, the prefix runs eagerly and the $S$-step Euler loop is captured once per $S$ with static buffers for noise, prefix cache and time steps, then replayed; on isolated calls its actions equal the eager ones exactly in all 8 settings.
-A probe tests whether the chatter of L4 matters by reusing one flow noise for every re-plan of an episode (fixed noise).
+For the graph, the $S$-step Euler loop is captured once per $S$ with static buffers and replayed (the prefix stays eager); on one observation its actions equal the eager ones exactly in all 8 settings.
+Two probes test whether the chatter of L4 matters, by reusing one flow noise for every re-plan of an episode (fixed noise), and how much the executed action depends on the noise for each $S$.
 
 \paragraph{Protocol.}
-Differences in SR are paired (exact McNemar test, Newcombe 95\% CI~\cite{newcombe1998improved}, Holm adjustment~\cite{holm1979simple} over comparisons with the released policy); a variant is non-inferior if the lower bound exceeds $-5$ points, a margin fixed in advance.
-Latency is measured on isolated calls, because the closed-loop runs share each GPU between two processes, and checked in the loop with one process per GPU.
+Differences in SR are paired (exact McNemar test, Newcombe 95\% CI~\cite{newcombe1998improved}, Holm adjustment~\cite{holm1979simple} over the nine comparisons of \cref{tab:sr}; the two tests on states 20--49 below are unadjusted); a variant is non-inferior if the lower bound exceeds $-5$ points, a margin fixed before any run.
+SR comes from eager runs; latency is measured on isolated calls, because these runs share each GPU between two processes, and checked in the loop with one process per GPU.
 
 \begin{table}[t]
 \centering\footnotesize
@@ -35,47 +34,45 @@ Fit $a{+}bS$ & $284{+}50.5S$ & $289{+}28.3S$ & $84{+}53.3S$ & $84{+}9.4S$ \\
 
 \begin{table}[t]
 \centering\footnotesize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{@{}lrrrr@{}}
+\setlength{\tabcolsep}{1.6pt}
+\begin{tabular}{@{}lrrrcr@{}}
 \toprule
-Variant & Vis./100 & SR & $\Delta$SR [95\% CI] & $p_\text{Holm}$ \\
+Variant & Vis./100 & SR & $\Delta$SR & 95\% CI & $p_\text{Holm}$ \\
 \midrule
-Released (bf16, $S{=}10$) & 100 & 77.0 & -- & -- \\
-\multicolumn{5}{@{}l}{\emph{H1: re-plan less}} \\
-Open loop, $k{=}5$ & 20.1 & 64.5 & $-12.5$ [$-20.3$, $-4.5$] & 0.018 \\
-Open loop, $k{=}10$ & 10.2 & 67.5 & $-9.5$ [$-17.3$, $-1.6$] & 0.124 \\
-$k{=}5$ + gripper events & 21.5 & 65.0 & $-12.0$ [$-18.7$, $-5.2$] & 0.007 \\
-Stale image ($k{=}5$, $S{=}3$) & 24.6 & 65.0 & $-12.0$ [$-19.1$, $-4.7$] & 0.013 \\
-\multicolumn{5}{@{}l}{\emph{H2: re-plan more cheaply}} \\
-bf16, $S{=}3$ & 100 & 79.0 & $+2.0$ [$-3.8$, $+7.8$] & 1.000 \\
-fp16, $S{=}3$ & 100 & 77.0 & $0.0$ [$-5.8$, $+5.8$] & 1.000 \\
-fp16, $S{=}2$ & 100 & 77.5 & $+0.5$ [$-5.7$, $+6.7$] & 1.000 \\
-fp16, $S{=}1$ & 100 & 79.5 & $+2.5$ [$-4.2$, $+9.2$] & 1.000 \\
-Probe: fixed noise ($S{=}3$) & 100 & 23.5 & $-53.5$ [$-60.3$, $-45.4$] & $<$0.001 \\
+Released (bf16, $S{=}10$) & 100 & 77.0 & -- & -- & -- \\
+\multicolumn{6}{@{}l}{\emph{H1: re-plan less}} \\
+Open loop, $k{=}5$ & 20.1 & 64.5 & $-12.5$ & [$-20.3$, $-4.5$] & 0.018 \\
+Open loop, $k{=}10$ & 10.2 & 67.5 & $-9.5$ & [$-17.3$, $-1.6$] & 0.124 \\
+$k{=}5$ + gripper events & 21.5 & 65.0 & $-12.0$ & [$-18.7$, $-5.2$] & 0.007 \\
+Stale image ($k{=}5$, $S{=}3$) & 24.6 & 65.0 & $-12.0$ & [$-19.1$, $-4.7$] & 0.013 \\
+\multicolumn{6}{@{}l}{\emph{H2: re-plan more cheaply}} \\
+bf16, $S{=}3$ & 100 & 79.0 & $+2.0$ & [$-3.8$, $+7.8$] & 1.000 \\
+fp16, $S{=}3$ & 100 & 77.0 & $0.0$ & [$-5.8$, $+5.8$] & 1.000 \\
+fp16, $S{=}2$ & 100 & 77.5 & $+0.5$ & [$-5.7$, $+6.7$] & 1.000 \\
+fp16, $S{=}1$ & 100 & 79.5 & $+2.5$ & [$-4.2$, $+9.2$] & 1.000 \\
+Probe: fixed noise, $S{=}3$ & 100 & 23.5 & $-53.5$ & [$-60.3$, $-45.4$] & $<$0.001 \\
 \bottomrule
 \end{tabular}
-\caption{Closed-loop results on 200 paired LIBERO-Spatial episodes (initial states 0--19); Holm adjustment over the nine comparisons. Vis./100: vision-encoder passes per 100 control steps.}
+\caption{Closed-loop results on 200 paired episodes (initial states 0--19); Holm over the nine comparisons. Vis./100: vision-encoder passes per 100 control steps.}
 \label{tab:sr}
 \end{table}
 
 \paragraph{Re-planning less lowers success (H1 rejected).}
 Calling the vision encoder about five times less often costs 12.0--12.5 points of SR (\cref{tab:sr}); with $k{=}10$ the drop of 9.5 points is not significant after adjustment.
-The event trigger removes most chatter (1.2 short gripper segments per 100 steps against 5.0) without recovering success; fresh proprioception does not replace a current image.
+The event trigger removes most chatter (1.2 short gripper segments per 100 steps, against 5.0) but not the loss; fresh proprioception does not replace a current image.
 
 \paragraph{Re-planning more cheaply preserves success (H2).}
-Along released $\to$ float16 $\to$ $S{=}3$ $\to$ graph, a re-plan takes 789, 616, 245 and 112\,ms, factors of 1.28, 2.51 and 2.19 ($7.05\times$ in total; \cref{tab:latency}).
+Along released $\to$ float16 $\to$ $S{=}3$ $\to$ graph, a re-plan takes 789, 616, 245 and 112\,ms, factors of 1.28, 2.51 and 2.19 ($7.1\times$ in total; \cref{tab:latency}).
 By the fits, an Euler step costs 51--53\,ms eagerly in either precision (launch-bound) but 28.3 and 9.4\,ms with the graph, which exposes the emulated arithmetic: the graph gains $1.38\times$ in bfloat16 and $3.46\times$ in float16 at $S{=}10$.
-On 200 pairs the lower bound for float16 $S{=}3$ ($-5.8$) misses the margin; on the planned 500 pairs (initial states 0--49) it succeeds in 78.4\% against 75.4\% ($+3.0$ points, 95\% CI $[-0.6, +6.6]$; task-cluster bootstrap $[-1.2, +8.4]$): non-inferior, with a non-significant gain ($p{=}0.13$).
-Fewer steps do not lower SR measurably either ($S{=}2$: 77.5\%, $S{=}1$: 79.5\%), and on 300 fresh pairs (initial states 20--49, a test fixed in advance) $S{=}1$ succeeds in 80.3\% against 74.3\% ($+6.0$ points, 95\% CI $[+0.6, +11.4]$, $p{=}0.04$; task bootstrap $[-1.0, +12.7]$) at 93\,ms per re-plan ($8.5\times$): non-inferior, and better on this test but not robustly across tasks.
-In the loop, a float16 $S{=}3$ re-plan takes 275\,ms eagerly and 114\,ms with the graph, close to the isolated values.
-Replay keeps the first action of every episode; whole trajectories match the eager ones in 10 of 20 episodes, exactly as often as two eager runs (10 of 20): execution is not bit-reproducible, and the loop amplifies small differences.
+On 200 pairs the lower bound for float16 $S{=}3$ ($-5.8$) misses the margin, so states 20--49 were added: on these 300 pairs alone it succeeds in 79.3\% against 74.3\% ($+5.0$ points, CI $[+0.3, +9.7]$), on all 500 in 78.4\% against 75.4\% ($+3.0$, CI $[-0.6, +6.6]$; task bootstrap $[-1.2, +8.4]$): non-inferior in both.
+Fewer steps do not lower SR measurably either ($S{=}2$: 77.5\%, $S{=}1$: 79.5\%); on the same 300 pairs, in a test fixed before the run, $S{=}1$ succeeds in 80.3\% against 74.3\% ($+6.0$, CI $[+0.6, +11.4]$; task bootstrap $[-1.0, +12.7]$) at 93\,ms ($8.5\times$): non-inferior, with a gain close to that of $S{=}3$ and not robust across tasks.
+On RoboTwin, where SmolVLA executes 50 actions per chunk, one step lowers success from 64.4\% to 35.0\%~\cite{tang2026fewer}; re-planning at every step may correct what one step gets wrong.
+In the loop, a float16 $S{=}3$ re-plan takes 275\,ms eagerly and 114\,ms with the graph (released: 862\,ms); replay keeps the first action and the outcome of all 20 episodes, and whole trajectories match in 10, as often as two eager runs: execution is not bit-reproducible.
 
 \paragraph{Consistent noise is not the remedy.}
-Fixed noise removes the chatter (0.5 against 3.8 short gripper segments per 100 steps) but lowers SR from 77.0\% to 23.5\% (111 against 4 discordant pairs, $p<10^{-27}$), while $S{=}1$ removes it too (0.7) without lowering SR: chatter accompanies failures without causing them.
-A reading consistent with both, not tested here: fresh noise gives errors that average out over steps, fixed noise repeats one error at every step, and $S{=}1$ gives almost none, since it returns $\boldsymbol\epsilon-v_\theta(\boldsymbol\epsilon,1\mid\mathbf o)$ and the minimiser of \cref{eq:fm} at $\tau{=}1$ is $v=\boldsymbol\epsilon-\mathbb E[\mathbf A\mid\mathbf o]$.
+Fixed noise removes the chatter (0.5 against 3.8 short gripper segments per 100 steps) but lowers SR from 77.0\% to 23.5\% (111 against 4 discordant pairs, $p<10^{-27}$), whereas $S{=}1$ removes it (0.7) without lowering SR, so chatter reads as a symptom rather than the main cause.
+Fresh noise gives errors that average out over steps and fixed noise repeats one error, whereas $S{=}1$ returns $\boldsymbol\epsilon-v_\theta(\boldsymbol\epsilon,1\mid\mathbf o)$, which at the minimiser of \cref{eq:fm} is $\mathbb E[\mathbf A\mid\mathbf o]$ for any $\boldsymbol\epsilon$ (a mean over modes if $p(\mathbf A\mid\mathbf o)$ is multimodal): on 193 observations, the executed action varies across 8 noises by 0.18 with $S{=}1$, against 0.71 with $S{=}3$ and 1.00 with $S{=}10$.
 
 \paragraph{Trade-offs and next bottleneck.}
-The float16 gain is specific to GPUs without bfloat16 tensor cores; elsewhere only the step and graph gains would apply (not measured).
-Float16 changes actions by 0.010 on average (0.049 at most, magnitude 0.17) without overflow; the graph needs static shapes and one capture per $S$.
-With 32\,ms of simulation, the loop runs at about 7\,Hz (control rate 20\,Hz).
-The vision-language prefix (84\,ms) takes 75\% of a re-plan at $S{=}3$ and 90\% at $S{=}1$; further gains require a cheaper prefix, which changes the model and needs training.
+The float16 gain needs a GPU without bfloat16 tensor cores (elsewhere only the step and graph gains apply, not measured); float16 changes actions by 0.010 on average (one observation), and the graph needs static shapes and one capture per $S$; with 32\,ms of simulation, the loop runs at about 7\,Hz (control rate 20\,Hz).
+The prefix (84\,ms, still eager) takes 75--90\% of a re-plan; further gains must come from it, through training-free kernel fusion or token reuse~\cite{ma2025running,xu2026vla} (not tested here) or a smaller retrained backbone.

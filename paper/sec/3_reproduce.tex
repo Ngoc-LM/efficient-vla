@@ -4,15 +4,14 @@
 \paragraph{Model and setup.}
 The study runs the released LeRobot implementation of SmolVLA (v0.6.1) with the checkpoint \texttt{HuggingFaceVLA/smolvla\_libero} on Kaggle (2$\times$ Tesla T4, PyTorch 2.11, MuJoCo 3.3.7, EGL rendering).
 The checkpoint differs from the paper configuration~\cite{shukor2025smolvla}: it keeps all 32 decoder layers of SmolVLM2-500M instead of 16, uses an action expert of width $0.5\times$ instead of $0.75\times$, and executes one action per predicted chunk ($n_\text{exec}{=}1$).
-It has 605M parameters (vision encoder 86M, connector 12M, language model 362M, action expert 97M) stored in bfloat16.
+It has 605M parameters, stored in bfloat16 (\cref{fig:pipeline}).
 
-\paragraph{Pipeline.}
-At control step $k$ the policy receives two RGB images (third-person and wrist, resized with padding to $512^2$), the instruction (at most 48 tokens) and an 8-D state (end-effector pose, two gripper joints).
-SigLIP encodes each image, a pixel-shuffle connector shortens it to a few tokens, and the language model processes the prefix [image; language; state] once, caching its keys and values per layer.
-The action expert, whose layers alternate cross-attention to this cache and self-attention over action tokens, predicts a chunk $\mathbf A\in\mathbb R^{50\times7}$ (end-effector delta pose and gripper).
-It is trained with $\mathcal L_\text{FM}$ (\cref{eq:fm}), with $\tau\sim\mathrm{Beta}(1.5,1)$ rescaled to $[0.001,1]$.
-At inference, $S{=}10$ Euler steps $\mathbf A\leftarrow\mathbf A-\tfrac1S v_\theta(\mathbf A,\tau\mid\mathbf o)$ integrate from $\tau{=}1$ (noise) to 0; a re-plan thus costs one prefix pass and $S$ expert passes.
-The first action is unnormalised and executed at 20\,Hz.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig/pipeline_compact.pdf}
+\caption{One re-plan. Two $512^2$ images, the instruction and the state form a prefix processed once; the expert, trained with $\mathcal L_\text{FM}$ (\cref{eq:fm}, $\tau\sim\mathrm{Beta}(1.5,1)$ on $[0.001,1]$), attends to its cache in each of $S{=}10$ Euler steps; the first of 50 actions (delta pose, gripper) is executed.}
+\label{fig:pipeline}
+\end{figure}
 
 \paragraph{Metric and protocol.}
 Success rate (SR) is the fraction of episodes whose goal predicate (\eg \texttt{On(bowl, plate)}) holds within 280 steps.
@@ -20,5 +19,5 @@ An episode is a (task, stored initial state) pair; the 10 tasks run on initial s
 Methods are compared on identical episodes with common random numbers: the flow noise at step $k$ is seeded by (episode, $k$).
 
 \paragraph{Differences and result.}
-MuJoCo is pinned below 3.4, from which the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}; the evaluation uses 20 instead of 10 episodes per task.
-The reproduced SR of 77.0\% [70.7, 82.3] (Wilson 95\% CI) is below the 90\% reported for the paper configuration but inside the 70--83\% obtained by others with this checkpoint~\cite{lerobot2354,islam2026faster}.
+MuJoCo is pinned below 3.4, from which the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}.
+The reproduced SR of 77.0\% [70.7, 82.3] (Wilson 95\% CI) is below the 90\% reported for the paper configuration but inside the 57--83\% obtained by others with this checkpoint~\cite{lerobot2354,islam2026faster}.
