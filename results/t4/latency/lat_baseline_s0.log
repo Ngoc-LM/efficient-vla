@@ -8,3 +8,5 @@
 [04:53:28] t5 i0 success=1 steps=91 calls=91 vision=91 policy=79.7s wall=89.7s | 6/10 SR=0.667 ETA=0.17h
 [04:55:23] t6 i0 success=1 steps=120 calls=120 vision=120 policy=104.0s wall=115.0s | 7/10 SR=0.714 ETA=0.12h
 [04:57:45] t7 i0 success=1 steps=148 calls=148 vision=148 policy=127.8s wall=141.5s | 8/10 SR=0.750 ETA=0.08h
+[04:59:19] t8 i0 success=1 steps=97 calls=97 vision=97 policy=83.1s wall=92.9s | 9/10 SR=0.778 ETA=0.04h
+[05:01:19] t9 i0 success=1 steps=126 calls=126 vision=126 policy=108.0s wall=119.7s | 10/10 SR=0.800 ETA=0.00h
