@@ -2,3 +2,8 @@
 7277 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-1 --save-actions --method flow --flow-steps 3 --dtype fp16 --shard 0/2 --device cuda:0 --skip-from /kaggle/working/results/latency/lat_fp16_s3_s*.csv --max-hours 6 --out /kaggle/working/results/latency/lat_fp16_s3_s0.csv
 7279 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-1 --save-actions --method flow --flow-steps 3 --dtype fp16 --shard 1/2 --device cuda:1 --skip-from /kaggle/working/results/latency/lat_fp16_s3_s*.csv --max-hours 6 --out /kaggle/working/results/latency/lat_fp16_s3_s1.csv
 [06:30:29] done  lat_fp16_s3: 20 episodes
+pushed 3367 files -> results/t4 @ 8c0fb21
+[06:30:32] start lat_fp16_s3_graph: --method flow --flow-steps 3 --dtype fp16 --graph
+7397 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-1 --save-actions --method flow --flow-steps 3 --dtype fp16 --graph --shard 0/2 --device cuda:0 --skip-from /kaggle/working/results/latency/lat_fp16_s3_graph_s*.csv --max-hours 6 --out /kaggle/working/results/latency/lat_fp16_s3_graph_s0.csv
+7399 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-1 --save-actions --method flow --flow-steps 3 --dtype fp16 --graph --shard 1/2 --device cuda:1 --skip-from /kaggle/working/results/latency/lat_fp16_s3_graph_s*.csv --max-hours 6 --out /kaggle/working/results/latency/lat_fp16_s3_graph_s1.csv
+[06:39:03] done  lat_fp16_s3_graph: 20 episodes
