@@ -16,6 +16,80 @@
   "chatter_per_100_failures": 12.378048780487804,
   "switches_per_100": 6.845849563650771
  },
+ "flow_s1_fp16": {
+  "n": 500,
+  "sr": 0.8,
+  "sr_ci95": [
+   0.7627108946948261,
+   0.8327145010282427
+  ],
+  "calls_per_episode": 136.978,
+  "calls_per_100_steps": 100.0,
+  "policy_s_per_episode": 35.634476199999995,
+  "policy_ms_per_step": 260.1474411949364,
+  "policy_ms_per_call_p50": 264.105,
+  "steps_success_median": 97.0,
+  "chatter_per_100": 0.76924135150758,
+  "chatter_per_100_failures": 1.5214285714285711,
+  "switches_per_100": 1.816052524372342,
+  "paired_vs_ref": {
+   "n_pairs": 500,
+   "sr_a": 0.754,
+   "sr_b": 0.8,
+   "a_only": 45,
+   "b_only": 68,
+   "diff_b_minus_a": 0.04600000000000004,
+   "ci95_newcombe": [
+    0.004267180687895812,
+    0.08769598725331695
+   ],
+   "ci95_task_bootstrap": [
+    -0.028,
+    0.132
+   ],
+   "mcnemar_p": 0.038018645582796474,
+   "noninferior": true,
+   "mcnemar_p_holm": 0.1520745823311859,
+   "holm_family_size": 9
+  }
+ },
+ "flow_s2_fp16": {
+  "n": 200,
+  "sr": 0.775,
+  "sr_ci95": [
+   0.7122587676433947,
+   0.8273763028491088
+  ],
+  "calls_per_episode": 142.56,
+  "calls_per_100_steps": 100.0,
+  "policy_s_per_episode": 50.639948000000004,
+  "policy_ms_per_step": 355.2184904601571,
+  "policy_ms_per_call_p50": 362.50649999999996,
+  "steps_success_median": 99.0,
+  "chatter_per_100": 3.697426758046326,
+  "chatter_per_100_failures": 9.817460317460318,
+  "switches_per_100": 5.347802964879158,
+  "paired_vs_ref": {
+   "n_pairs": 200,
+   "sr_a": 0.77,
+   "sr_b": 0.775,
+   "a_only": 19,
+   "b_only": 20,
+   "diff_b_minus_a": 0.0050000000000000044,
+   "ci95_newcombe": [
+    -0.057240410006038175,
+    0.06724384878680414
+   ],
+   "ci95_task_bootstrap": [
+    -0.07,
+    0.095
+   ],
+   "mcnemar_p": 1.0,
+   "noninferior": false,
+   "mcnemar_p_holm": 1.0,
+   "holm_family_size": 9
+  }
+ },
  "flow_s3": {
   "n": 200,
   "sr": 0.79,
@@ -49,8 +123,8 @@
    ],
    "mcnemar_p": 0.6075913612730801,
    "noninferior": true,
-   "mcnemar_p_holm": 0.6075913612730801,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 1.0,
+   "holm_family_size": 9
   }
  },
  "flow_s3_fp16": {
@@ -86,8 +160,45 @@
    ],
    "mcnemar_p": 0.12839640292640084,
    "noninferior": true,
-   "mcnemar_p_holm": 0.2567928058528017,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 0.3851892087792025,
+   "holm_family_size": 9
+  }
+ },
+ "flow_s3_fp16_fixnoise": {
+  "n": 200,
+  "sr": 0.235,
+  "sr_ci95": [
+   0.18157433415232588,
+   0.29841368882762537
+  ],
+  "calls_per_episode": 240.02,
+  "calls_per_100_steps": 100.0,
+  "policy_s_per_episode": 113.11746950000001,
+  "policy_ms_per_step": 471.2835159570036,
+  "policy_ms_per_call_p50": 474.452,
+  "steps_success_median": 103.0,
+  "chatter_per_100": 0.4943968122190632,
+  "chatter_per_100_failures": 0.5205415499533146,
+  "switches_per_100": 1.2835599850993242,
+  "paired_vs_ref": {
+   "n_pairs": 200,
+   "sr_a": 0.77,
+   "sr_b": 0.235,
+   "a_only": 111,
+   "b_only": 4,
+   "diff_b_minus_a": -0.535,
+   "ci95_newcombe": [
+    -0.6032190048940752,
+    -0.4538451508276026
+   ],
+   "ci95_task_bootstrap": [
+    -0.645,
+    -0.415
+   ],
+   "mcnemar_p": 3.4507445333269973e-28,
+   "noninferior": false,
+   "mcnemar_p_holm": 3.1056700799942976e-27,
+   "holm_family_size": 9
   }
  },
  "open_loop_k10": {
@@ -123,8 +234,8 @@
    ],
    "mcnemar_p": 0.024811974571552153,
    "noninferior": false,
-   "mcnemar_p_holm": 0.07443592371465646,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 0.12405987285776077,
+   "holm_family_size": 9
   }
  },
  "open_loop_k5": {
@@ -160,8 +271,8 @@
    ],
    "mcnemar_p": 0.0030653176696087397,
    "noninferior": false,
-   "mcnemar_p_holm": 0.012261270678434959,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 0.018391906017652438,
+   "holm_family_size": 9
   }
  },
  "open_loop_k5_evt_h5": {
@@ -198,8 +309,8 @@
    ],
    "mcnemar_p": 0.000936222910851825,
    "noninferior": false,
-   "mcnemar_p_holm": 0.00561733746511095,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 0.0074897832868146,
+   "holm_family_size": 9
   }
  },
  "stale_k5_s3": {
@@ -235,8 +346,8 @@
    ],
    "mcnemar_p": 0.001841554788492544,
    "noninferior": false,
-   "mcnemar_p_holm": 0.00920777394246272,
-   "holm_family_size": 6
+   "mcnemar_p_holm": 0.012890883519447808,
+   "holm_family_size": 9
   }
  }
 }

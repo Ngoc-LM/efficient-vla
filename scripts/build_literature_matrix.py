@@ -175,7 +175,10 @@ def sheet_this_study(wb):
              ("stale_k5_s3", "Stale image (refresh every 5 steps), 3 steps"),
              ("open_loop_k5", "Open loop, 5 actions per re-plan"),
              ("open_loop_k5_evt_h5", "Open loop 5 + gripper-event re-plan"),
-             ("open_loop_k10", "Open loop, 10 actions per re-plan")]
+             ("open_loop_k10", "Open loop, 10 actions per re-plan"),
+             ("flow_s2_fp16", "fp16, 2 steps"),
+             ("flow_s1_fp16", "fp16, 1 step"),
+             ("flow_s3_fp16_fixnoise", "fp16, 3 steps, one fixed noise per episode (probe)")]
     order = [o for o in order if o[0] in s] + [(k, k) for k in s if k not in dict(order)]
     r0 = note + 2
     header(ws, r0, ["Configuration (paired, same episodes, common random numbers)", "n", "Success rate",
@@ -195,7 +198,9 @@ def sheet_this_study(wb):
                 c.number_format = fm
     ws.cell(row=r0 + len(order) + 2, column=1, value=(
         "Source: results/t4/summary.json (Newcombe paired CI; exact McNemar, unadjusted). "
-        "Non-inferiority margin: -5 pp.")).font = Font(name=F, size=9, italic=True)
+        "Non-inferiority margin: -5 pp. fp16 1 step pools the exploratory states 0-19 with the confirmation "
+        "states 20-49; the pre-specified test on states 20-49 alone gives +6.0 pp [+0.6, +11.4], p = 0.04 "
+        "(results/t4/report_numbers.json).")).font = Font(name=F, size=9, italic=True)
     for j, w in enumerate([46, 8, 12, 14, 14, 14, 12, 16], 1):
         ws.column_dimensions[get_column_letter(j)].width = w
 
@@ -205,7 +210,7 @@ def sheet_notes(wb):
     notes = [
         "How this matrix was built: every entry was read from the paper's own arXiv abstract, HTML or PDF "
         "(column 'Source'). 'UNVERIFIED' marks values not found in the text that was read; '(reviewer inference)' "
-        "marks open questions that are our reading, not the authors' statement.",
+        "marks open questions that are the reviewer's reading, not the authors' statement.",
         "Inconsistencies found in the sources: Diffusion Policy states 10 DDIM inference steps (Sec. 3.4) and 16 "
         "(App. A.4); VLA-Cache's 1.7x headline is larger than its per-model tables (OpenVLA 1.63x); TinyVLA text "
         "and tables differ (44.5% vs 47.8%); A2C2 Table 1 and Table 7 differ for the same settings and its LIBERO "

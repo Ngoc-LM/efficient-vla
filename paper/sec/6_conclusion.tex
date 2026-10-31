@@ -3,6 +3,6 @@
 
 For the released SmolVLA checkpoint on a T4, the cost of a re-plan is set less by FLOPs than by emulated bfloat16 and a launch-bound flow loop.
 Sharing computation across steps lowers success by about 12 points, whereas removing these overheads and the discretisation slack makes a re-plan $7.0\times$ cheaper and non-inferior on 500 paired episodes.
-Down to one Euler step, success does not drop measurably (\pending{D5}), whereas one noise per episode removes chatter and most successes, suggesting that chatter is a symptom.
+One Euler step ($8.5\times$) is non-inferior on fresh episodes, with a gain not robust across tasks, whereas one noise per episode removes chatter and most successes, suggesting that chatter is a symptom.
 \textbf{Limitations:} one checkpoint, suite and GPU type, in simulation; the baseline (77.0\%) is below the 90\% of the paper configuration.
 \textbf{Future work:} a cheaper prefix (distillation into a smaller backbone), and the same paired closed-loop test on embedded GPUs and exported runtimes~\cite{islam2026faster}.

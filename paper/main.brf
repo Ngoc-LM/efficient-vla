@@ -22,8 +22,8 @@
 \backcite {yue2024deer}{{1}{2}{section*.1}}
 \backcite {shukor2025smolvla}{{1}{2}{section*.1}}
 \backcite {islam2026faster}{{1}{2}{section*.1}}
-\backcite {chi2025diffusion}{{1}{2}{section*.3}}
-\backcite {li2024cogact}{{1}{2}{section*.3}}
+\backcite {chi2025diffusion}{{2}{2}{section*.3}}
+\backcite {li2024cogact}{{2}{2}{section*.3}}
 \backcite {ho2020denoising}{{2}{2}{section*.3}}
 \backcite {black2024pi_0}{{2}{2}{section*.3}}
 \backcite {shukor2025smolvla}{{2}{2}{section*.3}}
@@ -37,5 +37,4 @@
 \backcite {lerobot2354}{{2}{3}{section*.7}}
 \backcite {newcombe1998improved}{{3}{5}{section*.14}}
 \backcite {holm1979simple}{{3}{5}{section*.14}}
-\backcite {sendai2025leave}{{3}{5}{section*.17}}
 \backcite {islam2026faster}{{4}{6}{section.6}}

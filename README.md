@@ -8,7 +8,21 @@ identical episodes with paired statistics.
 
 ## Results
 
-<!-- RESULTS: filled from results/t4/summary.json once the last runs finish -->
+Released checkpoint on LIBERO-Spatial: **77.0%** success on 200 episodes (75.4% on 500), one re-plan
+**789 ms** on a T4 (emulated bfloat16 + a launch-bound 10-step flow loop).
+
+| Variant (paired with the released policy) | Re-plan (ms) | Pairs | SR | ΔSR [95% CI] |
+|---|---|---|---|---|
+| Released (bf16, 10 Euler steps) | 789 | 500 | 75.4 | – |
+| Open loop, 5 actions per chunk | – | 200 | 64.5 | −12.5 [−20.3, −4.5] |
+| Stale image (k=5, S=3) | – | 200 | 65.0 | −12.0 [−19.1, −4.7] |
+| fp16, 3 steps, CUDA graph | 112 | 500 | 78.4 | +3.0 [−0.6, +6.6] |
+| fp16, 1 step, CUDA graph (fresh states 20–49) | 93 | 300 | 80.3 | +6.0 [+0.6, +11.4] |
+| fp16, 3 steps, one fixed noise per episode | – | 200 | 23.5 | −53.5 [−60.3, −45.4] |
+
+Re-planning less often lowers success; re-planning more cheaply keeps it (non-inferior, margin
+−5 points). Holding the flow noise fixed removes gripper chatter but most successes too.
+Full table: `PYTHONPATH=src python scripts/report_numbers.py` (writes `results/t4/report_numbers.json`).
 
 All numbers come from `results/t4/summary.json` (paired comparisons) and
 `results/t4/profile/` (latency). The report (`paper/`) explains the protocol and the analysis.

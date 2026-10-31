@@ -252,6 +252,48 @@
    "mcnemar_p": 0.12839640292640084,
    "noninferiority_margin": 0.05,
    "noninferior": true
+  },
+  "fp16_s1_states_20_49": {
+   "n_pairs": 300,
+   "sr_a": 0.7433333333333333,
+   "sr_b": 0.8033333333333333,
+   "both": 198,
+   "a_only": 25,
+   "b_only": 43,
+   "neither": 34,
+   "diff_b_minus_a": 0.06000000000000005,
+   "ci95_newcombe": [
+    0.006001652660629672,
+    0.11389599380389476
+   ],
+   "ci95_task_bootstrap": [
+    -0.01,
+    0.12666666666666668
+   ],
+   "mcnemar_p": 0.038460053348927506,
+   "noninferiority_margin": 0.05,
+   "noninferior": true
+  },
+  "fp16_s1_states_0_49_descriptive": {
+   "n_pairs": 500,
+   "sr_a": 0.754,
+   "sr_b": 0.8,
+   "both": 332,
+   "a_only": 45,
+   "b_only": 68,
+   "neither": 55,
+   "diff_b_minus_a": 0.04600000000000004,
+   "ci95_newcombe": [
+    0.004267180687895812,
+    0.08769598725331695
+   ],
+   "ci95_task_bootstrap": [
+    -0.028,
+    0.132
+   ],
+   "mcnemar_p": 0.038018645582796474,
+   "noninferiority_margin": 0.05,
+   "noninferior": true
   }
  },
  "latency_in_loop": {
