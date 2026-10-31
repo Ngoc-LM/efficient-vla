@@ -21,3 +21,9 @@ pushed 2286 files -> results/t4 @ 8042e32
 pushed 2383 files -> results/t4 @ 386df5c
 pushed 2451 files -> results/t4 @ e48998a
 [01:33:37] done  spatial_fp16_s2: 200 episodes
+pushed 2514 files -> results/t4 @ a4aad89
+[01:33:39] start spatial_fp16_s1: --method flow --flow-steps 1 --dtype fp16
+2945 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 1 --dtype fp16 --shard 0/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_fp16_s1_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s1_s0.csv
+2947 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 1 --dtype fp16 --shard 1/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_fp16_s1_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s1_s1.csv
+2950 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 1 --dtype fp16 --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_fp16_s1_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s1_s2.csv
+2953 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 1 --dtype fp16 --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_fp16_s1_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s1_s3.csv
