@@ -38,3 +38,4 @@ pushed 2743 files -> results/t4 @ dd4ddfa
 3892 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --fixed-noise --shard 2/4 --device cuda:0 --skip-from /kaggle/working/results/raw/spatial_fp16_s3_fixnoise_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s3_fixnoise_s2.csv
 3895 python3 -u -m evla.run_eval --suite libero_spatial --tasks 0-9 --inits 0-19 --save-actions --videos 2 --method flow --flow-steps 3 --dtype fp16 --fixed-noise --shard 3/4 --device cuda:1 --skip-from /kaggle/working/results/raw/spatial_fp16_s3_fixnoise_s*.csv --max-hours 6 --out /kaggle/working/results/raw/spatial_fp16_s3_fixnoise_s3.csv
 pushed 2798 files -> results/t4 @ 388b3b4
+pushed 2836 files -> results/t4 @ 9de9001
