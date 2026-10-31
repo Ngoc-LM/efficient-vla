@@ -68,10 +68,29 @@ def table(ws, headers, rows, widths, start_row=1):
     ws.freeze_panes = ws.cell(row=start_row + 1, column=2)
 
 
+# The ten papers kept in the matrix: most cited and most directly tied to this study, ordered from the
+# model studied, through the action heads, to the efficiency levers by the part of the loop they change.
+CORE = ["SmolVLA", "pi0", "DiffusionPolicy", "OpenVLA-OFT", "VLA-Cache", "EfficientVLA", "RTC", "RealtimeVLA",
+        "Coda", "Islam-ONNX"]
+RELEVANCE = {
+    "SmolVLA": "The model studied: its LIBERO checkpoint is reproduced and optimised here.",
+    "pi0": "Same design as SmolVLA (VLM prefix + flow-matching action expert, 10 Euler steps on a cached prefix).",
+    "DiffusionPolicy": "Reference diffusion action head for the diffusion vs flow-matching comparison.",
+    "OpenVLA-OFT": "Reports speed and success together; chunked parallel decoding is the 'execute more per call' idea.",
+    "VLA-Cache": "Reuses visual tokens across frames: the idea behind the stale-image variant (H1).",
+    "EfficientVLA": "Training-free acceleration with a small success loss: the same setting as this study.",
+    "RTC": "Asynchronous execution of chunked flow policies: the alternative to re-planning at every step (H1).",
+    "RealtimeVLA": "CUDA graphs and kernel-level work for pi0: the graph lever of H2.",
+    "Coda": "Fewer flow steps for pi0.5 (3 steps hold, 1 step drops): the step lever of H2 and its contrast.",
+    "Islam-ONNX": "Faster deployment of this very checkpoint lowered success (70% to 41%): motivates paired tests.",
+}
+
+
 def sheet_matrix(wb, papers):
     ws = wb.active
     ws.title = "Matrix"
-    headers = ["ID", "Paper", "First author", "Year", "Venue / arXiv", "Model size & backbone", "Action generation",
+    headers = ["ID", "Paper", "First author", "Year", "Venue / arXiv", "Relevance to this study",
+               "Model size & backbone", "Action generation",
                "Efficiency lever (what is reduced and how)", "Main target", "Reported efficiency gain (hardware)",
                "Benchmark & success rate", "Assumptions", "Trade-offs", "Open questions", "Training-free",
                "Source (read)"]
@@ -79,10 +98,10 @@ def sheet_matrix(wb, papers):
     for p in papers:
         venue = p["venue"] if p["venue"] and p["venue"] != "arXiv" else "arXiv"
         rows.append([p["id"], p["title"], p["first_author"], p["year"], f'{venue} ({p["arxiv_id"]})',
-                     p["params_and_backbone"], p["action_generation"], p["efficiency_lever"],
+                     RELEVANCE[p["id"]], p["params_and_backbone"], p["action_generation"], p["efficiency_lever"],
                      TARGETS.get(p["id"], ""), p["reported_gain"], p["benchmark_success"], p["assumptions"],
                      p["tradeoffs"], p["open_questions"], p["training_free"], p["url"]])
-    table(ws, headers, rows, [13, 30, 16, 6, 22, 34, 34, 44, 22, 44, 44, 36, 36, 40, 9, 30])
+    table(ws, headers, rows, [13, 30, 16, 6, 22, 40, 34, 34, 44, 22, 44, 44, 36, 36, 40, 9, 30])
     ws.row_dimensions[1].height = 30
 
 
@@ -212,19 +231,20 @@ def sheet_notes(wb):
         "(column 'Source'). 'UNVERIFIED' marks values not found in the text that was read; '(reviewer inference)' "
         "marks open questions that are the reviewer's reading, not the authors' statement.",
         "Inconsistencies found in the sources: Diffusion Policy states 10 DDIM inference steps (Sec. 3.4) and 16 "
-        "(App. A.4); VLA-Cache's 1.7x headline is larger than its per-model tables (OpenVLA 1.63x); TinyVLA text "
-        "and tables differ (44.5% vs 47.8%); A2C2 Table 1 and Table 7 differ for the same settings and its LIBERO "
-        "tables contain no RTC column.",
-        "A2C2 trains its own SmolVLA from scratch on LIBERO; its execution-horizon results (e=5: 0.83 > e=1: 0.77) "
-        "are not for the checkpoint used in this study, for which executing 5 actions per re-plan lowers SR by "
-        "12.5 pp.",
+        "(App. A.4); VLA-Cache's 1.7x headline is larger than its per-model tables (OpenVLA 1.63x).",
+        "Scope: the matrix keeps the ten papers that are most cited and most directly tied to this study (column "
+        "'Relevance to this study'). Also read, and cited in the report where used, but left out to keep the matrix "
+        "focused: OpenVLA, FAST, TinyVLA, DeeR-VLA, CogACT, A2C2, an efficient-VLA survey and vla.cpp. Of these, "
+        "A2C2 matters most for H1: it trains its own SmolVLA from scratch on LIBERO, and its execution-horizon "
+        "results (e=5: 0.83 > e=1: 0.77) do not transfer to the checkpoint used here, where executing 5 actions per "
+        "re-plan lowers SR by 12.5 pp.",
         "Islam (2026) uses the same checkpoint and LeRobot version on a Turing GPU (RTX 2060): its PyTorch+AMP "
         "Spatial success (70.0%, 100 episodes) is in the range of this study's baseline (77.0%, 200 episodes); its "
         "ONNX speed-up came with a behaviour change (truncated instructions), which motivates checking closed-loop "
         "equivalence for every efficiency change.",
         "Coda (2026) and Realtime-VLA (2025) already apply fewer flow steps and CUDA graphs, respectively; this "
         "study does not claim these levers as new.",
-        "Venues for pi0, OpenVLA and OpenVLA-OFT are not stated on the arXiv pages read and are left as arXiv.",
+        "Venues for pi0 and OpenVLA-OFT are not stated on the arXiv pages read and are left as arXiv.",
     ]
     ws.column_dimensions["A"].width = 140
     for i, t in enumerate(notes, 1):
@@ -234,7 +254,8 @@ def sheet_notes(wb):
 
 
 def main():
-    papers = [json.loads(line) for line in open(ROOT / "deliverables/data/litmatrix.jsonl")]
+    by_id = {d["id"]: d for d in (json.loads(line) for line in open(ROOT / "deliverables/data/litmatrix.jsonl"))}
+    papers = [by_id[i] for i in CORE]
     wb = Workbook()
     sheet_matrix(wb, papers)
     sheet_diffusion_flow(wb)

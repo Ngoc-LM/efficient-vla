@@ -2,7 +2,7 @@
 \label{sec:study}
 
 \paragraph{Efficiency levers.}
-\cref{tab:study} groups the efficiency work in the literature matrix by the part of the inference loop it changes.
+\cref{tab:study} groups efficiency work by the part of the inference loop it changes.
 Token and layer reduction assumes redundancy across frames~\cite{xu2026vla} or easy situations~\cite{yue2024deer} and saves compute only in the language model.
 Chunked and asynchronous execution assumes that actions predicted from an older observation stay valid; SmolVLA's asynchronous mode finished tasks 30\% faster but lowered success from 78.3\% to 73.3\%~\cite{shukor2025smolvla}.
 Systems work assumes the model stays numerically the same, which an export can violate~\cite{islam2026faster}.
@@ -22,7 +22,7 @@ Execution & RTC~\cite{black2026real}, A2C2~\cite{sendai2025leave} & $>$300\,ms d
 Systems & Realtime-VLA~\cite{ma2025running}, ONNX~\cite{islam2026faster}, Coda~\cite{tang2026fewer} & $\pi_0$ 106.5$\to$27.3\,ms (4090); $-40$\% latency, SR drop; 2 flow steps + learned corrector \\
 \bottomrule
 \end{tabular}
-\caption{Efficiency levers (selection of the literature matrix), as reported by each paper.}
+\caption{Efficiency levers, as reported by each paper.}
 \label{tab:study}
 \end{table}
 

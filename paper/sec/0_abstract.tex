@@ -3,7 +3,7 @@ A vision-language-action (VLA) policy that re-plans at every control step pays f
 This report measures where that cost goes for the released LIBERO checkpoint of SmolVLA on a Tesla T4 and tests, on identical paired episodes, which reductions preserve closed-loop success.
 A re-plan takes 789\,ms, dominated by emulated bfloat16 arithmetic and a launch-bound 10-step flow loop.
 Re-planning less often (open-loop chunks, gripper-event triggers, a 5-step-old image) lowers success by 12.0--12.5 points (Holm $p\le0.018$).
-Re-planning more cheaply (float16, 3 Euler steps, a bit-exact CUDA-graph replay) cuts a re-plan to 112\,ms ($7.0\times$) and is non-inferior on 500 paired episodes (78.4\% vs 75.4\%, 95\% CI of the difference $[-0.6, +6.6]$ points); one Euler step (93\,ms, $8.5\times$) is non-inferior on 300 fresh pairs (80.3\% vs 74.3\%, CI $[+0.6, +11.4]$).
+Re-planning more cheaply (float16, 3 Euler steps, a CUDA-graph replay with identical actions) cuts a re-plan to 112\,ms ($7.0\times$) and is non-inferior on 500 paired episodes (78.4\% vs 75.4\%, 95\% CI of the difference $[-0.6, +6.6]$ points); one Euler step (93\,ms, $8.5\times$) is non-inferior on 300 fresh pairs (80.3\% vs 74.3\%, CI $[+0.6, +11.4]$).
 Reusing one flow noise per episode removes gripper chatter but lowers success from 77.0\% to 23.5\%.
 Code: \url{https://github.com/Ngoc-LM/efficient-vla}.
 \end{abstract}
