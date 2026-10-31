@@ -74,3 +74,6 @@
 [08:54:00] t9 i34 success=1 steps=119 calls=119 vision=119 policy=159.5s wall=170.8s | 72/75 SR=0.750 ETA=0.18h
 [08:56:46] t9 i38 success=1 steps=115 calls=115 vision=115 policy=154.1s wall=165.7s | 73/75 SR=0.753 ETA=0.12h
 [08:59:44] t9 i42 success=1 steps=123 calls=123 vision=123 policy=166.0s wall=178.0s | 74/75 SR=0.757 ETA=0.06h
+[00:14:24] start {'suite': 'libero_spatial', 'tasks': '0-9', 'inits': '20-49', 'method': 'baseline', 'k': 5, 'warm_t0': 0.5, 'warm_steps': 3, 'flow_steps': None, 'img_tau': None, 'no_gripper_refresh': False, 'dtype': 'native', 'event_trigger': False, 'graph': False, 'hold': 5, 'fixed_noise': False, 'policy': 'HuggingFaceVLA/smolvla_libero', 'device': 'cuda:0', 'seed_base': 1000, 'shard': '0/4', 'skip_from': '/kaggle/working/results/raw/spatial_baseline_x_s*.csv', 'out': '/kaggle/working/results/raw/spatial_baseline_x_s0.csv', 'max_hours': 6.0, 'save_actions': True, 'videos': 2} | shard episodes=75 done=74
+[00:15:45] policy cfg: n_action_steps=1 chunk=50 num_steps=10 dtypes={'bfloat16': 600902304, 'float32': 4031872} gpu=Tesla T4
+[00:19:16] t9 i46 success=1 steps=110 calls=110 vision=110 policy=157.6s wall=206.2s | 1/1 SR=1.000 ETA=0.00h
