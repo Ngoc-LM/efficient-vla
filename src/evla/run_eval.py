@@ -109,6 +109,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     n_action_steps = args.k if args.method == "open_loop" else None
+    if args.device.startswith("cuda:"):
+        # make cuda:N the current device, so that streams and CUDA graphs are created on it
+        import torch
+
+        torch.cuda.set_device(args.device)
     b = loading.build(
         args.suite,
         policy_path=args.policy,

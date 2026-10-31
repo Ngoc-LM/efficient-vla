@@ -535,15 +535,16 @@ class GraphedFlowSampler:
                 x = x + dt * v
             return x
 
-        side = torch.cuda.Stream()
-        side.wait_stream(torch.cuda.current_stream())
-        with torch.cuda.stream(side):
-            for _ in range(self.warmup):
-                run()
-        torch.cuda.current_stream().wait_stream(side)
-        graph = torch.cuda.CUDAGraph()
-        with torch.cuda.graph(graph):
-            out = run()
+        with torch.cuda.device(noise.device):  # streams and the graph on the model's GPU
+            side = torch.cuda.Stream()
+            side.wait_stream(torch.cuda.current_stream())
+            with torch.cuda.stream(side):
+                for _ in range(self.warmup):
+                    run()
+            torch.cuda.current_stream().wait_stream(side)
+            graph = torch.cuda.CUDAGraph()
+            with torch.cuda.graph(graph):
+                out = run()
         return {"graph": graph, "kv": kv, "pad": s_pad, "noise": s_noise, "out": out, "times": times}
 
     @torch.no_grad()
