@@ -33,6 +33,7 @@ All numbers come from `results/t4/summary.json` (paired comparisons) and
 | `results/t4/raw/` | Episode CSVs, run metadata, executed actions, a few videos |
 | `paper/` | LaTeX report (`main.tex`) |
 | `deliverables/` | Literature matrix (`literature_matrix.xlsx`) and its sources |
+| `notebooks/kaggle_efficient_vla.ipynb` | Clean copy of the Kaggle notebook (setup, profiling, queued runs, analysis) |
 | `tests/test_offline.py` | CPU tests (`python -m pytest -q tests`) |
 
 ## Environment
