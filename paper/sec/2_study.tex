@@ -6,7 +6,7 @@
 Token and layer reduction assumes redundancy across frames~\cite{xu2026vla} or easy situations~\cite{yue2024deer} and saves compute only in the language model.
 Chunked and asynchronous execution assumes that actions predicted from an older observation stay valid; SmolVLA's asynchronous mode finished tasks 30\% faster but lowered success from 78.3\% to 73.3\%~\cite{shukor2025smolvla}.
 Systems work assumes the model stays numerically the same, which an export can violate~\cite{islam2026faster}.
-Two questions remain open: speed-ups are reported next to aggregate success rates, although a non-significant difference is not equivalence~\cite{islam2026faster}, and most latencies come from GPUs with native bfloat16 (RTX 4090, A100, A40).
+Two gaps remain: speed-ups are reported next to aggregate success rates, though a non-significant difference is not equivalence, and most latencies come from GPUs with native bfloat16 (RTX 4090, A100, A40).
 
 \begin{table}[t]
 \centering\scriptsize
@@ -38,4 +38,4 @@ They differ in four respects.
 (i) Target: noise versus velocity.
 (ii) Path: the linear path gives each training pair a constant velocity and yields straighter sampling trajectories~\cite{lipman2022flow}; on RoboTwin, $\pi_{0.5}$ keeps 71.3\% success with 3 flow steps against 71.5\% with 10, and drops to 59.8\% with one~\cite{tang2026fewer}.
 (iii) Sampler: Diffusion Policy uses 100 DDPM steps in simulation and 10 DDIM~\cite{song2020denoising} steps on the robot, CogACT 10 DDIM steps with guidance, flow models 10 Euler steps.
-(iv) Architecture: Diffusion Policy repeats its whole denoiser; CogACT, $\pi_0$ and SmolVLA run the VLM once and repeat only a head on its cached output, and for SmolVLA such a step is dominated by kernel launches at batch one (\cref{sec:analysis}).
+(iv) Architecture: Diffusion Policy repeats its whole denoiser; CogACT, $\pi_0$ and SmolVLA run the VLM once and repeat only a head on its cached output.

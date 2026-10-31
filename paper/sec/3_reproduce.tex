@@ -17,7 +17,7 @@ The first action is unnormalised and executed at 20\,Hz.
 \paragraph{Metric and protocol.}
 Success rate (SR) is the fraction of episodes whose goal predicate (\eg \texttt{On(bowl, plate)}) holds within 280 steps.
 An episode is a (task, stored initial state) pair; the 10 tasks run on initial states 0--19 (200 episodes; 0--49 for the main comparison).
-Methods are compared on identical episodes with common random numbers: the flow noise at step $k$ is seeded by (episode, $k$) for every method.
+Methods are compared on identical episodes with common random numbers: the flow noise at step $k$ is seeded by (episode, $k$).
 
 \paragraph{Differences and result.}
 MuJoCo is pinned below 3.4, from which the stored initial states of task~5 settle differently and SmolVLA drops from 80\% to 28\% on that task~\cite{lerobot4390}; the evaluation uses 20 instead of 10 episodes per task.
