@@ -15,7 +15,7 @@ It has 605M parameters, stored in bfloat16 (\cref{fig:pipeline}).
 
 \paragraph{Metric and protocol.}
 Success rate (SR) is the fraction of episodes whose goal predicate (\eg \texttt{On(bowl, plate)}) holds within 280 steps.
-An episode is a (task, stored initial state) pair; the 10 tasks run on initial states 0--19 (200 episodes; 0--49 for the main comparison).
+An episode is a (task, stored initial state) pair; the 10 tasks run on initial states 0--19 (200 episodes; 0--49 for the main comparisons, \cref{sec:improve}).
 Methods are compared on identical episodes with common random numbers: the flow noise at step $k$ is seeded by (episode, $k$).
 
 \paragraph{Differences and result.}

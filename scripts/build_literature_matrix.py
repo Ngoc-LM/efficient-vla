@@ -72,6 +72,18 @@ def header(ws, row, headers):
         c.alignment = Alignment(wrap_text=True, vertical="center")
 
 
+def fit_height(texts_widths, line_pt=12.5, min_pt=15.0):
+    """Row height (pt) that shows every wrapped line: ~1.1 characters per unit of column width at 9 pt."""
+    import math
+    lines = 1
+    for text, width in texts_widths:
+        if text is None:
+            continue
+        n = sum(max(1, math.ceil(len(part) / max(1.0, width * 1.1))) for part in str(text).split("\n"))
+        lines = max(lines, n)
+    return max(min_pt, lines * line_pt + 4)
+
+
 def table(ws, headers, rows, widths, start_row=1):
     header(ws, start_row, headers)
     for i, r in enumerate(rows, start_row + 1):
@@ -83,6 +95,8 @@ def table(ws, headers, rows, widths, start_row=1):
                 c.fill = ALT
     for j, w in enumerate(widths, 1):
         ws.column_dimensions[get_column_letter(j)].width = w
+    for i, r in enumerate(rows, start_row + 1):
+        ws.row_dimensions[i].height = fit_height([(pretty(v), w) for v, w in zip(r, widths)])
     ws.freeze_panes = ws.cell(row=start_row + 1, column=2)
 
 
@@ -169,8 +183,9 @@ def sheet_diffusion_flow(wb):
         "probability-flow ODE); the linear flow path has constant velocity per sample, so coarse Euler steps stay "
         "close (this study: 3 steps deviate 0.32 vs a 1.37 sampling spread, LIBERO-Object).",
         "3. Sampling: DDPM needs many steps (DDIM ~10); flow models use ~10 Euler steps by default and degrade "
-        "gracefully when fewer are used, down to a model-dependent limit (Coda: pi0.5 holds at 3 steps, drops "
-        "at 1; SmolVLA drops at 1).",
+        "gracefully when fewer are used, down to a limit that depends on the model and on how many actions run "
+        "open loop (Coda, RoboTwin, 10 or 50 actions per chunk: π0.5 holds at 3 steps and drops at 1, SmolVLA drops "
+        "at 1; this study, one action per re-plan on LIBERO-Spatial: SmolVLA holds at 1 step).",
         "4. Cost per step: in all four VLA-style models a step re-runs only a small head on a cached VLM output, "
         "so per-step cost is set by the head size and by kernel-launch overhead at batch 1.",
     ]
@@ -178,7 +193,7 @@ def sheet_diffusion_flow(wb):
         c = ws.cell(row=k, column=1, value=t)
         c.font, c.alignment = BODY, WRAP
         ws.merge_cells(start_row=k, start_column=1, end_row=k, end_column=10)
-        ws.row_dimensions[k].height = 30
+        ws.row_dimensions[k].height = fit_height([(t, 260)])
 
 
 def sheet_this_study(wb):
@@ -229,7 +244,8 @@ def sheet_this_study(wb):
             "Variant SR", "Difference (points)", "95% CI low (points)", "95% CI high (points)", "McNemar p",
             "Holm p (Table 4 family)"]
     header(ws, r0, head)
-    fmts = [None, None, "0", "0.0%", "0.0%", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "0.000", "0.000"]
+    pfmt = '[<0.001]"<0.001";0.000'
+    fmts = [None, None, "0", "0.0%", "0.0%", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", "+0.0;-0.0;0.0", pfmt, pfmt]
     for i, (lab, states, c, in_table) in enumerate(rows, r0 + 1):
         vals = [lab, states, c["n_pairs"], c["sr_a"], c["sr_b"], c["diff_b_minus_a"] * 100,
                 c["ci95_newcombe"][0] * 100, c["ci95_newcombe"][1] * 100, c["mcnemar_p"],
@@ -271,11 +287,11 @@ def sheet_notes(wb):
         "study does not claim these levers as new.",
 
     ]
-    ws.column_dimensions["A"].width = 140
+    ws.column_dimensions["A"].width = 110
     for i, t in enumerate(notes, 1):
         c = ws.cell(row=i, column=1, value=t)
         c.font, c.alignment = BODY, WRAP
-        ws.row_dimensions[i].height = 42
+        ws.row_dimensions[i].height = fit_height([(t, 110)])
 
 
 def main():

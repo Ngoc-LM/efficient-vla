@@ -71,4 +71,4 @@ Every failure closes the gripper at least once.
 \paragraph{Warm-started flow (rejected before closed-loop tests).}
 Starting the integration from the previous chunk, shifted by one step and re-noised to flow time $t_0$, was calibrated offline on 586 control steps of five LIBERO-Object episodes.
 The deviation of the first action from a 10-step integration with the same noise was 0.83, 0.53 and 0.34 for $t_0=0.3, 0.5, 0.7$ (3 steps), against 0.32 for a cold start with 3 steps and 0.51 with 2 steps; the shifted previous chunk alone deviated by 1.31, and a 10-step integration with different noise by 1.37.
-A warm start was therefore no more accurate than a cold start with the same number of steps and was not evaluated in closed loop.
+With 3 steps a warm start was no more accurate than a cold start (0.34 at best against 0.32); with 2 steps it was (0.44 for $t_0=0.7$ against 0.51), but still less accurate than 3 cold steps, so it was not evaluated in closed loop.

@@ -6,7 +6,7 @@
 Token and layer reduction assumes redundancy across frames~\cite{xu2026vla} or easy situations~\cite{yue2024deer} and saves compute only in the language model.
 Chunked and asynchronous execution assumes that older actions stay valid; SmolVLA's asynchronous mode was 30\% faster but lowered success from 78.3\% to 73.3\%~\cite{shukor2025smolvla}.
 Systems work assumes the model stays numerically the same, which an export can violate~\cite{islam2026faster}.
-Two gaps remain: speed-ups come with aggregate success rates, though a non-significant difference is not equivalence, and most latencies with GPUs that have native bfloat16.
+Speed-ups are mostly reported with aggregate success rates, though a non-significant difference is not equivalence, and on GPUs with native bfloat16; the one paired test, of an export on a Turing GPU~\cite{islam2026faster}, found a loss.
 
 \begin{table}[t]
 \centering\scriptsize
@@ -17,7 +17,7 @@ Lever & Reported effect, by paper (hardware) \\
 \midrule
 Smaller model & SmolVLA~\cite{shukor2025smolvla}: 0.45B, LIBERO avg 87.3. TinyVLA~\cite{wen2025tinyvla}: 14 vs 292\,ms per action against OpenVLA (A6000). \\
 Fewer tokens or layers & VLA-Cache~\cite{xu2026vla}: $1.63\times$ (4090). EfficientVLA~\cite{yang2026efficientvla}: $1.93\times$ at 28.9\% FLOPs, $-0.6$ SR (A40). DeeR~\cite{yue2024deer}: $5.2$--$6.5\times$ fewer LLM FLOPs (trained). \\
-Decoding & FAST~\cite{pertsch2025fast}: up to $5\times$ faster training, 750 vs 100\,ms per chunk. OFT~\cite{kim2025fine}: $26\times$ throughput. CogACT~\cite{li2024cogact}: small DiT head. \\
+Decoding & FAST~\cite{pertsch2025fast}: up to $5\times$ faster training; 750\,ms per chunk vs 100 for $\pi_0$ (4090). OFT~\cite{kim2025fine}: $26\times$ throughput. CogACT~\cite{li2024cogact}: small DiT head. \\
 Execution & RTC~\cite{black2026real}: tolerates $>$300\,ms delay, +21\,ms per chunk. A2C2~\cite{sendai2025leave}: trained 4.7\,ms head. \\
 Systems & Realtime-VLA~\cite{ma2025running}: $\pi_0$ 106.5$\to$27.3\,ms against naive PyTorch (4090). ONNX~\cite{islam2026faster}: $-40$\% latency, lower SR. Coda~\cite{tang2026fewer}: 2 steps + learned corrector. \\
 \bottomrule

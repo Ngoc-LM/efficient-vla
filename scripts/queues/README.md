@@ -4,6 +4,11 @@ Each line of a queue file is `<run name> <run_eval options>`; `scripts/run_queue
 one after another on a Kaggle session and pushes results to `results/t4/`. Versions record what was run, in order;
 logs of each queue are in `results/t4/logs/`.
 
+Run names: `spatial_` = LIBERO-Spatial; `baseline` = released policy; `cold3` = fresh noise, S = 3 (bf16 unless
+`_fp16`); `fp16_s2`, `fp16_s1` = float16 with S = 2, 1; `ol5`, `ol10` = open loop, k = 5, 10; `_evt` = gripper-event
+re-planning; `stale5_cold3` = stale image (k = 5) with S = 3; `fixnoise` = one flow noise per episode; `_x` = initial
+states 20-49; `lat_` = in-loop latency runs; files `_s0`-`_s3` are the shards of one run (two per GPU).
+
 | Queue | Runs | Used in the report |
 |---|---|---|
 | `queue_spatial.txt` … `queue_spatial_v4.txt` | open loop (k = 5, 10), gripper events, stale image, bf16 S = 3, fp16 S = 3 on initial states 0–19, relaunched after session losses; v1–v2 also list variants dropped before running (warm start, others). The released policy on states 0–19 was run directly with `scripts/launch_eval.sh`. `results/t4/raw/*.csv` shows what actually ran. | Table 4 (H1, bf16/fp16 S = 3) |

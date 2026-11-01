@@ -22,6 +22,7 @@
    "noninferior": false,
    "calls_per_100_steps": 20.14519607545336,
    "chatter_per_100": 2.5383266115863243,
+   "vision_passes_per_100_steps": 20.14519607545336,
    "mcnemar_p_holm": 0.018391906017652438,
    "holm_family_size": 9
   },
@@ -47,6 +48,7 @@
    "noninferior": false,
    "calls_per_100_steps": 10.196334671271662,
    "chatter_per_100": 2.3783063784344596,
+   "vision_passes_per_100_steps": 10.196334671271664,
    "mcnemar_p_holm": 0.12405987285776077,
    "holm_family_size": 9
   },
@@ -72,6 +74,7 @@
    "noninferior": false,
    "calls_per_100_steps": 21.470839433870182,
    "chatter_per_100": 1.1845595238136628,
+   "vision_passes_per_100_steps": 21.470839433870182,
    "mcnemar_p_holm": 0.0074897832868146,
    "holm_family_size": 9
   },
@@ -97,6 +100,7 @@
    "noninferior": false,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 3.588396686230707,
+   "vision_passes_per_100_steps": 24.55306366473213,
    "mcnemar_p_holm": 0.012890883519447808,
    "holm_family_size": 9
   },
@@ -122,6 +126,7 @@
    "noninferior": true,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 3.9971226602393775,
+   "vision_passes_per_100_steps": 100.0,
    "mcnemar_p_holm": 1.0,
    "holm_family_size": 9
   },
@@ -147,6 +152,7 @@
    "noninferior": false,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 3.7919458199292064,
+   "vision_passes_per_100_steps": 100.0,
    "mcnemar_p_holm": 1.0,
    "holm_family_size": 9
   },
@@ -172,6 +178,7 @@
    "noninferior": false,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 3.697426758046326,
+   "vision_passes_per_100_steps": 100.0,
    "mcnemar_p_holm": 1.0,
    "holm_family_size": 9
   },
@@ -197,6 +204,7 @@
    "noninferior": true,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 0.7243126371326045,
+   "vision_passes_per_100_steps": 100.0,
    "mcnemar_p_holm": 1.0,
    "holm_family_size": 9
   },
@@ -222,6 +230,7 @@
    "noninferior": false,
    "calls_per_100_steps": 100.0,
    "chatter_per_100": 0.4943968122190632,
+   "vision_passes_per_100_steps": 100.0,
    "mcnemar_p_holm": 3.1056700799942976e-27,
    "holm_family_size": 9
   },

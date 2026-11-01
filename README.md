@@ -28,7 +28,9 @@ Re-planning less often lowers success; re-planning more cheaply keeps it (non-in
 the paired closed-loop evidence. Success rates come from eager runs; the CUDA graph returns the same actions on
 isolated calls, and in the loop graph and eager agree on the outcome of all 20 checked episodes. States 20–49
 were added to the fp16 S = 3 test after the 200-pair interim look; the S = 1 test on them was fixed before the run.
-All numbers: `PYTHONPATH=src python scripts/report_numbers.py` (writes `results/t4/report_numbers.json`).
+Success rates, paired tests, vision passes, in-loop latency, failure modes and the noise probe are recomputed by
+`PYTHONPATH=src python scripts/report_numbers.py` (writes `results/t4/report_numbers.json`); isolated latencies and
+the component profile come from `results/t4/profile/` (`graph_t4.json`, `profile_t4_v2.json`).
 
 ## Layout
 
@@ -43,13 +45,13 @@ All numbers: `PYTHONPATH=src python scripts/report_numbers.py` (writes `results/
 | `src/evla/noise_spread.py` | How much the executed action depends on the flow noise for S = 1, 3, 10 |
 | `src/evla/calibrate_warm.py` | Offline calibration of warm-started flow (rejected before closed-loop runs) |
 | `src/evla/stats.py`, `analyze.py` | Paired statistics (exact McNemar, Newcombe CI, task-cluster bootstrap, Holm); summary tables |
-| `scripts/report_numbers.py` | Every number quoted in the report, recomputed from the raw results |
+| `scripts/report_numbers.py` | The report's success rates, tests and probe numbers, recomputed from the raw results |
 | `scripts/kaggle_setup.sh`, `run_queue.sh`, `launch_eval.sh`, `bg.sh` | Pinned setup; queued, sharded, detached runs on two T4s |
 | `scripts/queues/` | The run queues in the order they ran, with a map to the report ([README](scripts/queues/README.md)) |
-| `results/t4/` | `raw/` episode CSVs, executed actions, a few videos; `latency/`, `profile/`, `probe/`; `logs/` |
+| `results/t4/` | `raw/` episode CSVs, executed actions, videos of selected episodes; `latency/`, `profile/`, `probe/`; `logs/` |
 | `notebooks/kaggle_efficient_vla.ipynb` | Clean copy of the Kaggle notebook |
 | `tests/test_offline.py` | CPU tests (`python -m pytest -q tests`) |
-| `docs/report_appendix.tex` | Material cut from the 4-page report (reproducibility, per-task results, failure modes, warm start) |
+| `docs/report_appendix.pdf` | Material cut from the 4-page report: reproducibility, per-task results, failure modes, warm start ([source](docs/report_appendix.tex)) |
 
 ## Environment
 
@@ -105,8 +107,8 @@ finished episodes in the CSV (or in `--skip-from`) are skipped.
 | Fixed noise | `... --fixed-noise` |
 
 Warm-starting the flow from the previous chunk was calibrated offline
-(`python -m evla.calibrate_warm --out results/calib.json`) and was no more accurate than a cold start with the same
-number of steps, so it was not run in closed loop.
+(`python -m evla.calibrate_warm --out results/calib.json`): with 3 steps it was no more accurate than a cold start,
+and with 2 steps it was still less accurate than 3 cold steps, so it was not run in closed loop.
 
 ## Statistics
 

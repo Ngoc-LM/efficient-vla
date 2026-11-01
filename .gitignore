@@ -22,3 +22,6 @@ paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
 deliverables/*slides*.pdf
+docs/*.aux
+docs/*.log
+docs/*.out

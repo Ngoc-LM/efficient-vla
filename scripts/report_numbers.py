@@ -132,6 +132,7 @@ def main() -> int:
         var = subset(runs[m], s0)
         c = cmp(ref0, var)
         c.update({k: v for k, v in summarise(var).items() if k in ("chatter_per_100", "calls_per_100_steps")})
+        c["vision_passes_per_100_steps"] = 100 * sum(int(r["n_vision_calls"]) for r in var) / sum(int(r["n_steps"]) for r in var)
         rows.append((label, c))
     adj = stats.holm([c["mcnemar_p"] for _, c in rows])
     for (label, c), p in zip(rows, adj):

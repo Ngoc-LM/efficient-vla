@@ -52,8 +52,9 @@ arrow((74.5, 31), (80, 32.5))
 box(61, 2, 38.5, 15, r"Action expert $\times S$ (97M)",
     r"$\mathbf{A}\leftarrow\mathbf{A}-\frac{1}{S}v_\theta(\mathbf{A},\tau\mid o)$, $\tau{:}\,1\to0$",
     fc=PINK, ec=RED, lw=0.8)
-ax.text(93.5, 22, r"noise $\epsilon$", ha="center", va="center", color=TXT, fontsize=SUB)
-arrow((89, 27), (87, 17), color=RED)
+arrow((86, 27), (80, 17), color=RED)  # the expert attends to the prefix cache
+ax.text(93, 22.5, r"noise $\epsilon$", ha="center", va="center", color=TXT, fontsize=SUB)
+arrow((93, 20.5), (93, 17))  # the flow starts from Gaussian noise
 box(35.5, 3.5, 22, 12, "Chunk 50×7", "1st action executed")
 box(0.5, 3.5, 28, 12, "LIBERO simulator", "20 Hz, then re-plan")
 arrow((61, 9.5), (57.5, 9.5))
